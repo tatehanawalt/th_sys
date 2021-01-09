@@ -14,5 +14,5 @@ Source `.thrc` from you shell init script
 
 e.g: If the path to this repo is `~/.th_sys`, add:
 ```
-[ -s ~/.th_sys/.thrc ] && . /.th_sys/.thrc
+[ -s ~/.th_sys/.thrc ] && . ~/.th_sys/.thrc
 ```

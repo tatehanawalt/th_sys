@@ -14,7 +14,8 @@ git --version 2>&1 >/dev/null
 GIT_IS_AVAILABLE=$?
 if [ $GIT_IS_AVAILABLE -eq 0 ];
 then
-  gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r")
+  # gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r")
+  gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | sed -e "s/^[ \t]*//")
   echo "\tgit: ${fg[green]}$gv${reset_color}"
 else
   echo "\t${fg[red]}git: NF${reset_color}"
