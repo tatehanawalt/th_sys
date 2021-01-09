@@ -1,3 +1,25 @@
 #!/usr/bin/env zsh
 
+autoload -U colors && colors
+
 echo -e "\n Audit Env\n"
+
+
+
+
+
+
+# Check for git cli
+git --version 2>&1 >/dev/null
+GIT_IS_AVAILABLE=$?
+if [ $GIT_IS_AVAILABLE -eq 0 ];
+then
+  gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r")
+  echo "\tgit: ${fg[green]}$gv${reset_color}"
+else
+  echo "\t${fg[red]}git: NF${reset_color}"
+fi
+
+
+
+echo

@@ -1,3 +1,27 @@
 #!/usr/bin/env zsh
 
-alias auditenv="~/.th_sys/.auditenv"
+# This file is meant to be sourced in your shell init script
+# This script expects ENV variable `TH_SYS_DIR` = Path of directory containing this file.
+# e.g ~/.th_sys
+#
+
+# autoload -U colors && colors
+
+
+TH_SYS_DIR=${0:a:h}
+
+# Posix complient test for is variable set
+if [ -z ${TH_SYS_DIR+x} ];
+then
+  echo -e "${fg[red]} th_sys: \$TH_SYS_DIR must be set to the directory containing this file...${reset_color}\n"
+  return
+fi
+
+echo -e " TH_SYS_DIR: $TH_SYS_DIR\n"
+
+if [ -s $TH_SYS_DIR/.auditenv ];
+then
+  alias auditenv="${TH_SYS_DIR}/.auditenv"
+else
+  echo -e "${fg[red]} .auditenv not found in \$TH_SYS_DIR(${TH_SYS_DIR}${reset_color})\n"
+fi
