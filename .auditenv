@@ -19,16 +19,18 @@ function mkLen() {
 }
 
 function printSet() {
-  # Alphabatize keys
+  echo
   IFS=$'\n' ks=($(sort <<< ${(k)cmdSet})); unset IFS
   ml=0 # ml -> max length of key
   for k in $ks; do kl=$(echo -n $k | wc -m) && [ $kl -gt $ml ] && ml=$kl; done
-  for k in $keyset; do
-    echo $k $cmdSet[$k]
+  ((ml = ml + 1))
+  printf -v pad %40s
+  for k in $ks; do
+    pkey=$k$pad
+    echo " ${pkey:0:$ml}$cmdSet[$k]"
   done
+  echo
 }
-
-echo
 
 addCmd docker 'docker --version'
 addCmd git 'echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r"'
@@ -37,7 +39,13 @@ addCmd npm 'npm --version'
 addCmd nvm 'nvm --version'
 addCmd python 'python --version 2>&1'
 addCmd pyenv 'pyenv --version'
+addCmd aws "echo $(aws --version 2>&1) | sed 's/ .*//'"
+addCmd brew "brew --version | sed -n 1p"
+addCmd mage "mage --version | sed -n 1p"
+addCmd aws-vault "aws-vault --version 2>&1"
+addCmd go "go version"
+addCmd pyenv "pyenv --version"
+addCmd terraform "terraform -version"
 
 printSet
 unset cmdSet
-echo
