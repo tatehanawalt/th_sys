@@ -2,25 +2,42 @@
 
 autoload -U colors && colors
 
-echo -e "\n Audit Env\n"
+declare -A cmdSet
 
+function addCmd() {
+  cmdSet[$1]=
+  if [[ ! -z $(command -v $1) ]];
+  then
+    cmdSet[$1]=$(eval $2 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+  fi
+}
 
+function mkLen() {
+  len=$1
+  str=$2
+  echo "${str:0:$len}"
+}
 
+function printSet() {
+  # Alphabatize keys
+  IFS=$'\n' ks=($(sort <<< ${(k)cmdSet})); unset IFS
+  ml=0 # ml -> max length of key
+  for k in $ks; do kl=$(echo -n $k | wc -m) && [ $kl -gt $ml ] && ml=$kl; done
+  for k in $keyset; do
+    echo $k $cmdSet[$k]
+  done
+}
 
+echo
 
+addCmd docker 'docker --version'
+addCmd git 'echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r"'
+addCmd node 'node --version'
+addCmd npm 'npm --version'
+addCmd nvm 'nvm --version'
+addCmd python 'python --version 2>&1'
+addCmd pyenv 'pyenv --version'
 
-# Check for git cli
-git --version 2>&1 >/dev/null
-GIT_IS_AVAILABLE=$?
-if [ $GIT_IS_AVAILABLE -eq 0 ];
-then
-  # gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | tr -d " \t\n\r")
-  gv=$(echo $(git --version 2>&1) | sed -e "s/git//g" -e "s/version//g" | sed -e "s/^[ \t]*//")
-  echo "\tgit: ${fg[green]}$gv${reset_color}"
-else
-  echo "\t${fg[red]}git: NF${reset_color}"
-fi
-
-
-
+printSet
+unset cmdSet
 echo

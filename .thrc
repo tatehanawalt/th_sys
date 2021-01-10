@@ -7,7 +7,6 @@
 
 # autoload -U colors && colors
 
-
 TH_SYS_DIR=${0:a:h}
 # Posix complient test for is variable set
 if [ -z ${TH_SYS_DIR+x} ];
@@ -18,7 +17,7 @@ fi
 
 if [ -s $TH_SYS_DIR/.auditenv ];
 then
-  alias auditenv="${TH_SYS_DIR}/.auditenv"
+  alias auditenv=". ${TH_SYS_DIR}/.auditenv"
 else
   echo -e "${fg[red]} .auditenv not found in \$TH_SYS_DIR(${TH_SYS_DIR}${reset_color})\n"
 fi
