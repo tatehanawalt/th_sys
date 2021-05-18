@@ -1,0 +1,86 @@
+#!/usr/bin/env zsh
+#
+# This is a brew project build script. This build will be called with a
+# This script must build and tar the project which will then be uploaded to a github release as a release asset
+#
+# PARAMS:
+#   1. project path
+#   2. destination path
+#   3. build version
+#   *: potentially more metadata in the future
+#
+# Return:
+#   Exit Code 0 - successfully packaged project to the destination path
+#   Exit Code 1 - input error (number of params, format of paramss, validity of params etc...)
+#                 This would also be fore a non-existent destination path or directory.
+#   Exit Code 2 - system failure (i.e something went wrong while building the project)
+#
+# More Information:
+# Assumptions:
+# 1. Project name equals the basename of the PROJECT_PATH
+# 2. The destination path will not be taken by anyther file object
+# 3. The destination directory will exist
+
+if [ ${#@} -lt 3 ]; then
+  printf "ERROR - build script ${0} args count less than 3. got argc=${#@}\n"
+  return  1
+fi
+
+local INIT_DIR=$(pwd)
+local PROJECT_PATH="$1"
+local PROJECT_NAME=$(basename "$PROJECT_PATH")
+local BUILD_TARGET="$2"
+local BUILD_VERSION="$3"
+
+if [ ! -d "$PROJECT_PATH" ]; then
+  printf "ERROR - build script ${0} PROJECT_PATH is not a directory at PROJECT_PATH=$PROJECT_PATH\n"
+  return  1
+fi
+
+if [ -f "$BUILD_TARGET" ]; then
+  printf "ERROR - build script ${0} BUILD_TARGET path is an existing fs object at BUILD_TARGET=$BUILD_TARGET\n"
+  return  1
+fi
+
+printf "BUILDING:\n"
+printf "- PROJECT_NAME=%s\n" "$PROJECT_NAME"
+printf "- PROJECT_PATH=%s\n" "$PROJECT_PATH"
+printf "- BUILD_TARGET=%s\n" "$BUILD_TARGET"
+printf "- BUILD_VERSION=%s\n" "$BUILD_VERSION"
+
+
+touch "$BUILD_TARGET"
+
+# cd "$PROJECT_PATH"
+# # --------------------------------------------------------------------------------------------
+# # Tar the source files
+# tar -czf "$BUILD_TARGET" .
+# if [ ! -f "$BUILD_TARGET" ]; then
+#   printf "ERROR: - build_script ${0} failed to tar source files from $PROJECT_PATH to $BUILD_TARGET\n"
+#   cd "$INIT_DIR"
+#   return 2
+# fi
+# cd "$INIT_DIR"
+return 0
+
+# local PROJECT_NAME=demo1
+# --------------------------------------------------------------------------------------------
+# This script builds the release artifact tar file for brew installation publishing
+# printf "BUILDING:\n"
+# printf "- PROJECT=%s\n" ${PROJECT_NAME}
+# printf "- REPO=%s\n" ${PUSH_REPO_NAME}
+# printf "- PUSH_UID=%s\n" "$PUSH_UID"
+# printf "- VERSION=%s\n" "$VERSION"
+# printf "- ROOT_DIR=%s\n" "$ROOT_DIR"
+# printf "- OUT_DIR=%s\n" "$OUT_DIR"
+# printf "- PROJECT_PATH=%s\n" "$PROJECT_PATH"
+# printf "- BUILD_TARGET=%s\n" "$BUILD_TARGET"
+# --------------------------------------------------------------------------------------------
+# Clean the <repo_path>/out directory
+# [ -d "$OUT_DIR" ]  && rm -r "$OUT_DIR"
+# mkdir "$OUT_DIR"
+# cd "$PROJECT_PATH"
+# local files_set=(${(@)$(ls)})
+# printf "- FS_ITEMS:\n"
+# printf "  • %s\n" $files_set
+# printf "- FS_ITEMS_COUNT=%d\n" ${#files_set}
