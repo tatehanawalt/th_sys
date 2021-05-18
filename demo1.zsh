@@ -1,3 +1,3 @@
 #!/usr/bin/env zsh
 
-printf "\n\n This is a HEAD brew script!\n\n"
+printf "\n\n This is an upgraded HEAD brew script!\n\n"
