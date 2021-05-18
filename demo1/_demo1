@@ -1,5 +1,4 @@
 #compdef demo1
-#autoload
 
 # Brew ZSH completion function
 
@@ -17,4 +16,4 @@ _demo1() {
   return 0
 }
 
-_demo1 "$@"
+_demo1 $@
