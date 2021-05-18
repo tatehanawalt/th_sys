@@ -1,4 +1,5 @@
 #compdef demo1
+#autoload
 
 # Brew ZSH completion function
 
