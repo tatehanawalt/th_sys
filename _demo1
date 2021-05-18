@@ -4,7 +4,6 @@
 # Brew ZSH completion function
 
 _demo1() {
-
   _arguments -C '1:dem1:->dem1'
   case "$state" in
     (dem1)
@@ -15,7 +14,6 @@ _demo1() {
       _describe -t commands 'command' commands && ret=0
     ;;
   esac
-
   return 0
 }
 
