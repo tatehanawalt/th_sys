@@ -2,12 +2,16 @@
 
 printf "BUILDING BREW DISTRIBUTION:\n"
 
+# Still need to work out a better way to manage this.....
+# local projects=(demozsh demogolang demonodejs) # this will be generated dynamically
+# local projects=(demozsh demogolang demonodejs) # this will be generated dynamically
+local projects=( demozsh demopython ) # this will be generated dynamically
+
 # Script variables:
 # --------------------------------------------------------------------------------------------
 local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
 local PUSH_REPO_NAME="th_sys"                     # Push release assets: - we can get this from git commands
 local init_dir=$(pwd)                             # This will be replaced by the root repository directory
-local projects=(demozsh demogolang demonodejs)    # this will be generated dynamically
 
 # External dependencies (SPECIFIED BY THE CALLER)
 local PUSH_UID=${BUILD_REPO_OWNER}
@@ -25,6 +29,10 @@ local -A SHA_MAP
 printf "Projects:\n"
 printf "- %s\n" $projects
 
+
+
+# Call the build file for each project with that specific project's parameters (output path, project path, version etc...)
+
 # Call the build script for each project
 for ((i=1;i<=${#projects};i++)); do
   local project_root="$ROOT_DIR/$projects[$i]"
@@ -38,10 +46,12 @@ for ((i=1;i<=${#projects};i++)); do
     printf "ERROR: project '$projects[$i]' out path is an existing file system object\n"
     return 2
   fi
+
   $build_script "$project_root" "$out_path" "$VERSION"
   exit_code=$?
+
   if [ $exit_code -ne 0 ]; then
-    printf "ERROR: project '$projects[$i]' build script exit_code != 0... got exit_code=$d\n" $exit_code
+    printf "ERROR: project '$projects[$i]' build script exit_code=$exit_code\n"
     return 2
   fi
   shaval=$(shasum -a 256 $out_path | sed 's/ .*//g')
@@ -56,7 +66,9 @@ for ((i=1;i<=${#projects};i++)); do
   SHA_MAP[$projects[$i]]="$shaval"
 done
 
+# Completed executing the build script for each project
 printf "COMPLETED:\n"
+
 for project in ${(k)SHA_MAP}; do
   printf "- %-10s - %s\n" $project $SHA_MAP[$project]
 done
