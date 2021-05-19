@@ -16,11 +16,11 @@
    #### Adding the path executable:
    You create a symbolic link with `ln -s <source> <target>` where `source` is the full path to the file and `target` is the path where the symbolic link will be located.
 
-   You can rename the symbolic link anything. Because this will be a brew file and the project is `dan3` we will be linking this as `dan3`
+   You can rename the symbolic link anything. Because this will be a brew file and the project is `demopython` we will be linking this as `demopython`
 
    The link will go in ANY of the directories in your `$PATH`. The system will search the paths in the order they are printed before using `sort` so the earlier the better but the first fiew paths are usually indeded for root/admin/sudo or system level utils so put the symlink assuming this path is in your $PATH use `/usr/local/bin`.
 
-   Specifically `ln -s <path/to/file/dan3.py> /usr/local/bin/dan3`
+   Specifically `ln -s <path/to/file/main.py> /usr/local/bin/demopython`
 
 # 6. DONE
 

@@ -7,12 +7,15 @@ printf "BUILDING BREW DISTRIBUTION:\n"
 local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
 local PUSH_REPO_NAME=".th_sys"                    # Push release assets: - we can get this from git commands
 local init_dir=$(pwd)                             # This will be replaced by the root repository directory
-local projects=(demozsh demogolang demonodejs)           # this will be generated dynamically
+# local projects=(demozsh)                        # this will be generated dynamically
+local projects=(demozsh demogolang demonodejs)    # this will be generated dynamically
+# local projects=(demozsh demogolang demonodejs)           # this will be generated dynamically
 
 # External dependencies (SPECIFIED BY THE CALLER)
 local PUSH_UID=${BUILD_REPO_OWNER}
 local AUTH_TOKEN=${BUILD_REPO_TOKEN}
-local VERSION="latest"
+local VERSION=${BUILD_VERSION}
+# local VERSION="latest"
 
 # --------------------------------------------------------------------------------------------
 # Define && Clean the OUT Directory - <repo_path>/out directory
@@ -83,16 +86,7 @@ upload_release_asset() {
   printf "- AUTH_TOKEN_LENGTH=%d\n" ${#4}
   printf "- FILE_PATH=%s\n" ${5}
 
-  # This checks that the passed auth api has the correct permissions
-  response_code=$(curl -s --write-out '%{http_code}' --silent --output /dev/null -H "Authorization: token $4" "https://api.github.com/repos/$1/$2")
-  if [ $response_code -ne 200 ]; then
-    printf "ERROR: AUTH response code != 200... got %s\n" $response_code
-    return 2
-  fi
-  printf "✔ PERMISSIONS_USER=%s\n" $1
-  printf "✔ PERMISSIONS_REPO=%s\n" $2
-
-  curl -s "https://api.github.com/repos/$1/$2/releases/$3"
+  # curl -s "https://api.github.com/repos/$1/$2/releases/$3"
 
   # This checks for the specific release tag
   response_code=$(curl -s --write-out '%{http_code}' --silent --output /dev/null "https://api.github.com/repos/$1/$2/releases/$3")
@@ -123,6 +117,25 @@ upload_release_asset() {
   printf "%s\n" $request_data
   return 0
 }
+
+
+
+
+
+
+
+# This checks that the passed auth api has the correct permissions
+local response_code=$(curl -s --write-out '%{http_code}' --silent --output /dev/null -H "Authorization: token $AUTH_TOKEN" "https://api.github.com/repos/$1/$2")
+if [ $response_code -ne 200 ]; then
+  printf "ERROR: AUTH response code != 200... got %s\n" $response_code
+  return 2
+fi
+printf "✔ PERMISSIONS_USER=%s\n" $1
+printf "✔ PERMISSIONS_REPO=%s\n" $2
+
+
+
+
 
 # --------------------------------------------------------------------------------------------
 # This actually calls the function that uses shell to upload the release asset
