@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 
-printf "\nBUILDING BREW DISTRIBUTION:\n\n"
+
+
+printf "BUILDING BREW DISTRIBUTION:\n"
 
 # --------------------------------------------------------------------------------------------
 # COMMAND: build_brew_dist
@@ -11,7 +13,7 @@ printf "\nBUILDING BREW DISTRIBUTION:\n\n"
 local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
 local PUSH_REPO_NAME=".th_sys"                    # Push release assets: - we can get this from git commands
 local init_dir=$(pwd)                             # This will be replaced by the root repository directory
-local projects=(demo1 demo2 demonodejs)           # this will be generated dynamically
+local projects=(demozsh demo2 demonodejs)           # this will be generated dynamically
 
 # External dependencies (SPECIFIED BY THE CALLER)
 local PUSH_UID=${BUILD_REPO_OWNER}
@@ -28,7 +30,6 @@ local -A SHA_MAP
 
 printf "Projects:\n"
 printf "- %s\n" $projects
-printf "\n"
 
 # Call the build script for each project
 for ((i=1;i<=${#projects};i++)); do
@@ -59,25 +60,14 @@ for ((i=1;i<=${#projects};i++)); do
     return 2
   fi
   SHA_MAP[$projects[$i]]="$shaval"
-  printf "\n"
 done
 
 for project in ${(k)SHA_MAP}; do
   printf "BUILID %s\n" $project
   printf "- sha: %s\n" $SHA_MAP[$project]
-  printf "\n"
 done
 
 return 0
-
-
-
-
-
-# printf "SHA_MAP:\n"
-# printf "\t%s\n" $SHA_MAP
-# printf "\n"
-# return 0
 
 # --------------------------------------------------------------------------------------------
 # Uploads a release asset to the designated parameter group destination
@@ -156,64 +146,7 @@ fi
 # This point indicates the release asset has been successfully published
 #
 # return the: shasum, version, asset download url parameters?
-printf "UPLOAD_RELEASE_ASSET Completed successfully...\n\n"
-printf "\n%s\n" "$result_data"
+printf "UPLOAD_RELEASE_ASSET Completed successfully...\n"
+printf "%s\n" "$result_data"
 printf "TGT_SHASUM=%s\n" "$TGT_SHASUM"
 # --------------------------------------------------------------------------------------------
-
-
-
-# This is <the snippet>
-
-# local TAR_SRC="$ROOT_DIR/$P_NAME"
-# local TAR_TGT="$OUT_DIR/$P_NAME.tar.gz"
-# local P_NAME=demo1
-#
-# # --------------------------------------------------------------------------------------------
-# # This script builds the release artifact tar file for brew installation publishing
-# printf "BUILDING:\n"
-# printf "- PROJECT=%s\n" ${P_NAME}
-# printf "- REPO=%s\n" ${PUSH_REPO_NAME}
-# printf "- PUSH_UID=%s\n" "$PUSH_UID"
-# printf "- VERSION=%s\n" "$VERSION"
-# printf "- ROOT_DIR=%s\n" "$ROOT_DIR"
-# printf "- OUT_DIR=%s\n" "$OUT_DIR"
-# printf "- TAR_SRC=%s\n" "$TAR_SRC"
-# printf "- TAR_TGT=%s\n" "$TAR_TGT"
-#
-# # --------------------------------------------------------------------------------------------
-# # Clean the <repo_path>/out directory
-# [ -d "$OUT_DIR" ]  && rm -r "$OUT_DIR"
-# mkdir "$OUT_DIR"
-# cd "$TAR_SRC"
-# local files_set=(${(@)$(ls)})
-# printf "- FS_ITEMS:\n"
-# printf "  • %s\n" $files_set
-# printf "- FS_ITEMS_COUNT=%d\n" ${#files_set}
-#
-# # --------------------------------------------------------------------------------------------
-# # Tar the source files
-# tar -czf "$TAR_TGT" .
-# if [ ! -f "$TAR_TGT" ]; then
-#   printf "ERROR: tar failed for source=%s, target=%s\n" "$TAR_SRC" "$TAR_TGT"
-#   return 2
-# fi
-
-
-# # Capture the shaval for the project
-# SHA_MAP[$projects[$i]]=$(shasum -a 256 $out_path | sed 's/ .*//g')
-# if [ -z "$TGT_SHASUM" ]; then
-#   printf "ERROR: project '$projects[$i]' SHASUM failed for out_path=$out_path\n"
-#   return 2
-# fi
-
-
-
-# <here is where the snippet went>
-# --------------------------------------------------------------------------------------------
-# Get the shasum of the tarfile
-# local TGT_SHASUM="$(shasum -a 256 $TAR_TGT | sed 's/ .*//g')"
-# if [ -z "$TGT_SHASUM" ]; then
-#   printf "ERROR: SHASUM failed for TAR_TARGET=%s\n" ${TAR_TGT}
-#   return 2
-# fi

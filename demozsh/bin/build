@@ -58,28 +58,5 @@ if [ ! -f "$BUILD_TARGET" ]; then
   cd "$INIT_DIR"
   return 2
 fi
-
 cd "$INIT_DIR"
 return 0
-
-# local PROJECT_NAME=demo1
-# --------------------------------------------------------------------------------------------
-# This script builds the release artifact tar file for brew installation publishing
-# printf "BUILDING:\n"
-# printf "- PROJECT=%s\n" ${PROJECT_NAME}
-# printf "- REPO=%s\n" ${PUSH_REPO_NAME}
-# printf "- PUSH_UID=%s\n" "$PUSH_UID"
-# printf "- VERSION=%s\n" "$VERSION"
-# printf "- ROOT_DIR=%s\n" "$ROOT_DIR"
-# printf "- OUT_DIR=%s\n" "$OUT_DIR"
-# printf "- PROJECT_PATH=%s\n" "$PROJECT_PATH"
-# printf "- BUILD_TARGET=%s\n" "$BUILD_TARGET"
-# --------------------------------------------------------------------------------------------
-# Clean the <repo_path>/out directory
-# [ -d "$OUT_DIR" ]  && rm -r "$OUT_DIR"
-# mkdir "$OUT_DIR"
-# cd "$PROJECT_PATH"
-# local files_set=(${(@)$(ls)})
-# printf "- FS_ITEMS:\n"
-# printf "  • %s\n" $files_set
-# printf "- FS_ITEMS_COUNT=%d\n" ${#files_set}

@@ -1,4 +1,4 @@
-#compdef demo1
+#compdef demozsh
 local curcontext="$curcontext" state state_descr line subcmd
 _arguments -C '1:commands:->commands'
 case "$state" in
