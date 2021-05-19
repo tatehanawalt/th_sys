@@ -1,15 +1,9 @@
 #!/usr/bin/env zsh
 
-
-
 printf "BUILDING BREW DISTRIBUTION:\n"
 
-# --------------------------------------------------------------------------------------------
-# COMMAND: build_brew_dist
-# --------------------------------------------------------------------------------------------
 # Script variables:
 # --------------------------------------------------------------------------------------------
-# TODO: Get these from git commands
 local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
 local PUSH_REPO_NAME=".th_sys"                    # Push release assets: - we can get this from git commands
 local init_dir=$(pwd)                             # This will be replaced by the root repository directory
@@ -62,9 +56,9 @@ for ((i=1;i<=${#projects};i++)); do
   SHA_MAP[$projects[$i]]="$shaval"
 done
 
+printf "COMPLETED:\n"
 for project in ${(k)SHA_MAP}; do
-  printf "BUILID %s\n" $project
-  printf "- sha: %s\n" $SHA_MAP[$project]
+  printf "- %-10s - %s\n" $project $SHA_MAP[$project]
 done
 
 return 0
