@@ -22,11 +22,9 @@
 
    Specifically `ln -s <path/to/file/dan3.py> /usr/local/bin/dan3`
 
-
 # 6. DONE
 
 ### At this point you should be able to type `dan3`. The system will search $PATH for an `executable` named `dan3`. The system will check for the shebang at the FIRST line of the file. If the shebang is correct the system will run the file using the shebang specified interpreter
-
 
 # ADDING YOUR CHANGES
 
