@@ -13,7 +13,7 @@ printf "BUILDING BREW DISTRIBUTION:\n"
 local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
 local PUSH_REPO_NAME=".th_sys"                    # Push release assets: - we can get this from git commands
 local init_dir=$(pwd)                             # This will be replaced by the root repository directory
-local projects=(demozsh demo2 demonodejs)           # this will be generated dynamically
+local projects=(demozsh demogolang demonodejs)           # this will be generated dynamically
 
 # External dependencies (SPECIFIED BY THE CALLER)
 local PUSH_UID=${BUILD_REPO_OWNER}

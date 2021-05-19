@@ -50,7 +50,7 @@ printf "- BUILD_VERSION=%s\n" "$BUILD_VERSION"
 
 cd "$PROJECT_PATH"
 mkdir out
-go build -ldflags "-s -w -X 'main.Version=#{version}'" -o out/demo2
+go build -ldflags "-s -w -X 'main.Version=#{version}'" -o out/$PROJECT_NAME
 cp -r doc out/doc
 
 # --------------------------------------------------------------------------------------------
