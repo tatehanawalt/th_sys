@@ -1,3 +1,5 @@
+# be sure to follow the `adding your changes` (last section of the README) when pushing changes to git
+
 # Steps for the first brew installable hello world
 
 # 1. Choose any language but preferably python
@@ -25,4 +27,9 @@
 
 ### At this point you should be able to type `dan3`. The system will search $PATH for an `executable` named `dan3`. The system will check for the shebang at the FIRST line of the file. If the shebang is correct the system will run the file using the shebang specified interpreter
 
- 
+
+# ADDING YOUR CHANGES
+
+1. don't push directly to main. Instead, checkout a branch `git checkout -b dan-start-python-brew-cli-project`. Then commit your changes `git add <files you added>`, `git commit -m <summary of what was added>`, then push to your branch `git push origin/dan-start-python-brew-cli-project`
+
+Now log in to Github and visit the repository, you should see a button that says something like 'create pull request' click that and wing it and well talk about it when we have a chance
