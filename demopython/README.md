@@ -24,9 +24,9 @@
 
 # 6. DONE
 
-### At this point you should be able to type `dan3`. The system will search $PATH for an `executable` named `dan3`. The system will check for the shebang at the FIRST line of the file. If the shebang is correct the system will run the file using the shebang specified interpreter
+### At this point you should be able to type `demopython`. The system will search $PATH for an `executable` named `demopython`. The system will check for the shebang at the FIRST line of the file, (the target of the symlink). If the shebang is correct the system will run the file using the shebang specified interpreter
 
-# ADDING YOUR CHANGES
+
 
 1. don't push directly to main. Instead, checkout a branch `git checkout -b dan-start-python-brew-cli-project`. Then commit your changes `git add <files you added>`, `git commit -m <summary of what was added>`, then push to your branch `git push origin/dan-start-python-brew-cli-project`
 
