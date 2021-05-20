@@ -29,7 +29,7 @@ fi
 local INIT_DIR=$(pwd)
 local PROJECT_PATH="$1"
 local PROJECT_NAME=$(basename "$PROJECT_PATH")
-local BUILD_TARGET="$2"
+local BUILD_TARGET="$2/$PROJECT_NAME.tar.gz"
 local BUILD_VERSION="$3"
 
 if [ ! -d "$PROJECT_PATH" ]; then
@@ -42,11 +42,10 @@ if [ -f "$BUILD_TARGET" ]; then
   return  1
 fi
 
-printf "BUILDING:\n"
-printf "- PROJECT_NAME=%s\n" "$PROJECT_NAME"
-printf "- PROJECT_PATH=%s\n" "$PROJECT_PATH"
-printf "- BUILD_TARGET=%s\n" "$BUILD_TARGET"
-printf "- BUILD_VERSION=%s\n" "$BUILD_VERSION"
+printf "PACKAGE: %s\n" "$PROJECT_NAME"
+printf " - PROJECT_PATH=%s\n" "$PROJECT_PATH"
+printf " - BUILD_TARGET=%s\n" "$BUILD_TARGET"
+printf " - BUILD_VERSION=%s\n" "$BUILD_VERSION"
 
 cd "$PROJECT_PATH"
 
