@@ -26,10 +26,9 @@ if [ ${#@} -lt 3 ]; then
   return  1
 fi
 
-local INIT_DIR=$(pwd)
 local PROJECT_PATH="$1"
 local PROJECT_NAME=$(basename "$PROJECT_PATH")
-local BUILD_TARGET="$2/$PROJECT_NAME.tar.gz"
+local BUILD_TARGET="$2"
 local BUILD_VERSION="$3"
 
 if [ ! -d "$PROJECT_PATH" ]; then
@@ -42,26 +41,34 @@ if [ -f "$BUILD_TARGET" ]; then
   return  1
 fi
 
-printf "PACKAGE: %s\n" "$PROJECT_NAME"
-printf " - PROJECT_PATH=%s\n" "$PROJECT_PATH"
-printf " - BUILD_TARGET=%s\n" "$BUILD_TARGET"
-printf " - BUILD_VERSION=%s\n" "$BUILD_VERSION"
+# Create a temporary build directory
+BUILD_TMP_DIR="$(mktemp -d)"
 
-cd "$PROJECT_PATH"
+# full path of the output .tar.gz file = <out_dir(arg 2)>/<project_name>.tar.gz
+ARCHIVE_DST_PATH="$BUILD_TARGET/$PROJECT_NAME.tar.gz"
 
-touch $BUILD_TARGET
+printf "PACKAGE: %s\n"            "$PROJECT_NAME"
+printf " - PROJECT_PATH=%s\n"     "$PROJECT_PATH"
+printf " - BUILD_TARGET=%s\n"     "$BUILD_TARGET"
+printf " - BUILD_VERSION=%s\n"    "$BUILD_VERSION"
+printf " - BUILD_TMP_DIR=%s\n"    "$BUILD_TMP_DIR"
+printf " - ARCHIVE_DST_PATH=%s\n" "$ARCHIVE_DST_PATH"
 
-return 0
+cp -r "$PROJECT_PATH/doc" "$BUILD_TMP_DIR"          # Copy over any documentation
 
-
-# --------------------------------------------------------------------------------------------
-# Tar the source files
-tar -czf "$BUILD_TARGET" .
-if [ ! -f "$BUILD_TARGET" ]; then
-  printf "ERROR: - build_script ${0} failed to tar source files from $PROJECT_PATH to $BUILD_TARGET\n"
-  cd "$INIT_DIR"
+# Tar the temporary build directory to the out directory specified with $2
+cd "$BUILD_TMP_DIR"
+tar -czf $ARCHIVE_DST_PATH *
+tar_exit_code=$?
+if [ $tar_exit_code -ne 0 ]; then
+  printf "ERROR: - ${PROJECT_NAME} tar failed with exit code $tar_exit_code\n"
   return 2
 fi
-cd "$INIT_DIR"
 
+if [ ! -f "$ARCHIVE_DST_PATH" ]; then
+  printf "ERROR: - build_script ${0} failed to tar source files from $PROJECT_PATH to $ARCHIVE_DST_PATH\n"
+  return 2
+fi
+
+printf "%s\n" "$ARCHIVE_DST_PATH"
 return 0
