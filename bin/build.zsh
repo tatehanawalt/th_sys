@@ -69,7 +69,7 @@ local BUILD_PROJECTS=(
   democ
   democpp
   demonodejs
-  # demogolang
+  demogolang
   demopython
   demozsh
 )
@@ -119,9 +119,6 @@ if [ -f "$BUILD_PATH" ]; then
   printf "ERROR - th-sys build.zsh build_path is a file not a directory at $BUILD_PATH\n"
   return 1
 fi
-
-
-
 
 # Print the build valid build parameters, then invoke the project packagers
 printf "REPOSITORY_NAME:      %s\n" $REPOSITORY_NAME
