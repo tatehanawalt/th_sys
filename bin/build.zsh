@@ -109,36 +109,29 @@ if [[ "$REPOSITORY_NAME" != "th_sys" ]]; then
 fi
 
 # buld out path
-local BUILD_PATH="$REPOSITORY_ROOT_PATH/out"
-
-# do NOT remove anything that is not a direcctory...
+local BUILD_PATH="$(mktemp -d)"
 if [ -z "$BUILD_PATH" ]; then
   printf "ERROR - th-sys BUILd_PATH is somehow empty\n"
   return 2
 fi
-
 # do NOT remove anything that is not a direcctory...
 if [ -f "$BUILD_PATH" ]; then
   printf "ERROR - th-sys build.zsh build_path is a file not a directory at $BUILD_PATH\n"
   return 1
 fi
 
+
+
+
 # Print the build valid build parameters, then invoke the project packagers
 printf "REPOSITORY_NAME:      %s\n" $REPOSITORY_NAME
 printf "REPOSITORY_ROOT_PATH: %s\n" $REPOSITORY_ROOT_PATH
 printf "BUILD_PATH:           %s\n" $BUILD_PATH
-
-#  Clean the build path
-[ -d "$BUILD_PATH" ] && rm -r "$BUILD_PATH"
-mkdir "$BUILD_PATH"
-printf "\n"
-
-#
 printf "PROJECTS: %d\n" ${#BUILD_PROJECTS}
-printf " - %s\n" $BUILD_PROJECTS
+printf " - %s\n" $BUILD_PROJECTS | sort
 printf "\n"
 
-CALL_DIR="$PWD"
+TH_SYS_BUILD_CALL_DIR="$PWD"
 
 # For each project in the 'BUILD_PROJECTS' array, call the projects package script:
 for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
@@ -159,21 +152,28 @@ for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
     return 2
   fi
 
-
   # Call the project packager
-  cd "$CALL_DIR"
+  cd "$TH_SYS_BUILD_CALL_DIR"
   $PROJECT_PACKAGER "$PROJECT_ROOT" "$BUILD_PATH" "$VERSION"
   exit_code=$?
   if [ $exit_code -ne 0 ]; then
     printf "ERROR: project '$BUILD_PROJECTS[$i]' build script NON-ZERO exit_code=$exit_code\n"
+    cd "$TH_SYS_BUILD_CALL_DIR"
     return 2
   fi
 
   # Make sure the package landed where we expected it since the packer exited successfully
   if [ ! -f "$BUILD_PATH/$BUILD_PROJECTS[$i].tar.gz" ]; then
     printf "ERROR: project '$BUILD_PROJECTS[$i]' distribution package not found at "$BUILD_PATH/$BUILD_PROJECTS[$i].tar.gz"\n"
+    cd "$TH_SYS_BUILD_CALL_DIR"
     return 2
   fi
 
   printf "\n"
 done
+
+# Cd to original directory
+cd "$TH_SYS_BUILD_CALL_DIR"
+# Log the output directory
+printf "%s\n" "$BUILD_PATH"
+exit 0

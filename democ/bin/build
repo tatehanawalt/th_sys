@@ -41,27 +41,24 @@ if [ -f "$BUILD_TARGET" ]; then
   return  1
 fi
 
-printf "PACKAGE: %s\n"         "$PROJECT_NAME"
-printf " - PROJECT_PATH=%s\n"  "$PROJECT_PATH"
-printf " - BUILD_TARGET=%s\n"  "$BUILD_TARGET"
-printf " - BUILD_VERSION=%s\n" "$BUILD_VERSION"
-
-BUILD_TMP_DIR="$PROJECT_PATH/out"
-mkdir "$BUILD_TMP_DIR"
-
-printf " - BUILD_TMP_DIR=%s\n" "$BUILD_TMP_DIR"
-
-# full path of the output .tar.gz file = <out_dir(arg 2)>/<project_name>.tar.gz
+BUILD_TMP_DIR="$(mktemp -d)"
 ARCHIVE_DST_PATH="$BUILD_TARGET/$PROJECT_NAME.tar.gz"
-printf " - BUILD_TMP_DIR=%s\n" "$BUILD_TMP_DIR"
 
+
+printf "PACKAGE: %s\n"            "$PROJECT_NAME"
+printf " - PROJECT_PATH=%s\n"     "$PROJECT_PATH"
+printf " - BUILD_TARGET=%s\n"     "$BUILD_TARGET"
+printf " - BUILD_VERSION=%s\n"    "$BUILD_VERSION"
+printf " - BUILD_TMP_DIR=%s\n"    "$BUILD_TMP_DIR"
+printf " - ARCHIVE_DST_PATH=%s\n" "$ARCHIVE_DST_PATH" # full path of the output .tar.gz file = <out_dir(arg 2)>/<project_name>.tar.gz
+
+mkdir "$BUILD_TMP_DIR"
 gcc "$PROJECT_PATH/main.c" -o "$BUILD_TMP_DIR/main"
 cp -r "$PROJECT_PATH/doc" "$BUILD_TMP_DIR"
 
 # --------------------------------------------------------------------------------------------
 # Tar the source files
 tar -czf "$ARCHIVE_DST_PATH" "$BUILD_TMP_DIR/*"
-# rm -r ""
 
 if [ ! -f "$ARCHIVE_DST_PATH" ]; then
   printf "ERROR: - build_script ${0} failed to tar source files from $PROJECT_PATH to $ARCHIVE_DST_PATH\n"
