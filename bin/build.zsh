@@ -92,15 +92,15 @@ fi
 # Get the root path of the git repository
 REPOSITORY_ROOT_PATH=$(git rev-parse --show-toplevel)
 if [ -z "$REPOSITORY_ROOT_PATH" ]; then
- printf "ERROR - th_sys build.zsh failed to locate the root repository path\n"
- return 1
+  printf "ERROR - th_sys build.zsh failed to locate the root repository path\n"
+  return 1
 fi
 
 # Get the name of the repository
 REPOSITORY_NAME=$(basename "$REPOSITORY_ROOT_PATH")
 if [[ "$REPOSITORY_NAME" != "th_sys" ]]; then
- printf "ERROR - th_sys build.zsh must be executed in the th_sys repository\n"
- return 1
+  printf "ERROR - th_sys build.zsh must be executed in the th_sys repository\n"
+  return 1
 fi
 
 # buld out path
@@ -127,7 +127,7 @@ printf "BUILD_PATH:           %s\n" $BUILD_PATH
 [ -d "$BUILD_PATH" ] && rm -r "$BUILD_PATH"
 mkdir "$BUILD_PATH"
 
-
+#
 printf "PROJECTS: %d\n" ${#BUILD_PROJECTS}
 printf " - %s\n" $BUILD_PROJECTS
 printf "\n"
@@ -164,7 +164,6 @@ for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
     printf "ERROR: project '$BUILD_PROJECTS[$i]' distribution package not found at "$BUILD_PATH/$BUILD_PROJECTS[$i].tar.gz"\n"
     return 2
   fi
-
 
   printf "\n"
 done
@@ -206,16 +205,6 @@ SHA_MAP[$projects[$i]]="$shaval"
 
 
 
-
-
-
-
-
-
-
-
-# printf "BUILDING BREW DISTRIBUTION:\n"
-# printf " - %s\n" $projects
 
 # --------------------------------------------------------------------------------------------
 # 2. Define required publish parameters and values

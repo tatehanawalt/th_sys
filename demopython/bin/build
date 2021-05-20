@@ -42,8 +42,7 @@ if [ -f "$BUILD_TARGET" ]; then
   return  1
 fi
 
-printf "BUILDING:\n"
-printf " - PROJECT_NAME=%s\n" "$PROJECT_NAME"
+printf "PACKAGE: %s\n" "$PROJECT_NAME"
 printf " - PROJECT_PATH=%s\n" "$PROJECT_PATH"
 printf " - BUILD_TARGET=%s\n" "$BUILD_TARGET"
 printf " - BUILD_VERSION=%s\n" "$BUILD_VERSION"
