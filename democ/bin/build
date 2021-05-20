@@ -41,7 +41,10 @@ if [ -f "$BUILD_TARGET" ]; then
   return  1
 fi
 
+# Create a temporary build directory
 BUILD_TMP_DIR="$(mktemp -d)"
+
+# full path of the output .tar.gz file = <out_dir(arg 2)>/<project_name>.tar.gz
 ARCHIVE_DST_PATH="$BUILD_TARGET/$PROJECT_NAME.tar.gz"
 
 printf "PACKAGE: %s\n"            "$PROJECT_NAME"
@@ -49,11 +52,20 @@ printf " - PROJECT_PATH=%s\n"     "$PROJECT_PATH"
 printf " - BUILD_TARGET=%s\n"     "$BUILD_TARGET"
 printf " - BUILD_VERSION=%s\n"    "$BUILD_VERSION"
 printf " - BUILD_TMP_DIR=%s\n"    "$BUILD_TMP_DIR"
-printf " - ARCHIVE_DST_PATH=%s\n" "$ARCHIVE_DST_PATH" # full path of the output .tar.gz file = <out_dir(arg 2)>/<project_name>.tar.gz
+printf " - ARCHIVE_DST_PATH=%s\n" "$ARCHIVE_DST_PATH"
+
 
 gcc "$PROJECT_PATH/main.c" -o "$BUILD_TMP_DIR/main" # Compile main.c
 cp -r "$PROJECT_PATH/doc" "$BUILD_TMP_DIR"          # Copy over any documentation
-tar -czf "$ARCHIVE_DST_PATH" "$BUILD_TMP_DIR/*"     # Tar the temporary build directory to the out directory specified with $2
+
+# Tar the temporary build directory to the out directory specified with $2
+cd "$BUILD_TMP_DIR"
+tar -czf $ARCHIVE_DST_PATH *
+tar_exit_code=$?
+if [ $tar_exit_code -ne 0 ]; then
+  printf "ERROR: - ${PROJECT_NAME} tar failed with exit code $tar_exit_code\n"
+  return 2
+fi
 
 if [ ! -f "$ARCHIVE_DST_PATH" ]; then
   printf "ERROR: - build_script ${0} failed to tar source files from $PROJECT_PATH to $ARCHIVE_DST_PATH\n"

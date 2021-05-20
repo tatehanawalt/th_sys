@@ -69,7 +69,7 @@ local BUILD_PROJECTS=(
   democ
   democpp
   demonodejs
-  demogolang
+  # demogolang
   demopython
   demozsh
 )
@@ -153,7 +153,6 @@ for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
   fi
 
   # Call the project packager
-  cd "$TH_SYS_BUILD_CALL_DIR"
   $PROJECT_PACKAGER "$PROJECT_ROOT" "$BUILD_PATH" "$VERSION"
   exit_code=$?
   if [ $exit_code -ne 0 ]; then
