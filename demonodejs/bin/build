@@ -55,6 +55,7 @@ printf " - BUILD_TMP_DIR=%s\n"    "$BUILD_TMP_DIR"
 printf " - ARCHIVE_DST_PATH=%s\n" "$ARCHIVE_DST_PATH"
 
 cp -r "$PROJECT_PATH/doc" "$BUILD_TMP_DIR"          # Copy over any documentation
+cp "$PROJECT_PATH/main.js" "$BUILD_TMP_DIR"         # Copy over main.js
 
 # Tar the temporary build directory to the out directory specified with $2
 cd "$BUILD_TMP_DIR"
