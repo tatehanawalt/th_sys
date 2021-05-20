@@ -12,42 +12,47 @@
 #
 # Call this script with 1 argument - the build version.
 #
-# Each project has a script that packages the project into a tar archive
-# This file calls that script for each project being built. Packagers are
-# called with ARGS:
+# Each project has a script that packages the project into a tar archive.
 #
-#   $1: Full path to the project
-#   $2: Directory where the project pacckager placces the packaged archive on success
-#   $3: The Build Version (same across all packages)
+# This file (th_shs/bin/build.zsh) calls each project's archive packager
+# script (or binary executable) to build the projects archive
 #
-# Packagers exith with code 0 on successful
+# ARGS passed to each projects archive packager script:
+#
+#   $1: Full path to the project (unique to the specific project)
+#   $2: Directory where the project archiive pacckager placces the
+#       archive on success (same for every project)
+#   $3: The Build Version  (same for every project)
+#
+# Archive packagers exit with code 0 on successful
 # Any exit code that is NOT a 0 indicates an failure or error of some kind
-# This script exits immedietly if any packager fails
+# This script exits immedietly if any project archive packager fails
 # -----------------------------------------------------------------------------
 # Overview:
 # Projects are packaged for distribution as .tar.gz archives. Each project
-# contains a script responsible for packaging that projects distribution archive.
+# contains a script (or binary executable) responsible for packaging that
+# projects distribution archive.
 #
 # The th_sys/bin/build.zsh script:
 #
 #   • Determines the build output directory
 #   • Removes any existing items from that directory
 #   • Determins which projects need to be packaged
-#   • Exits immedietly after any packager fails
-#   • Calls project packagers sequentially (for the time being)
+#   • Exits immedietly after any project archive packager fails
+#   • Calls project archive packagers sequentially (for the time being)
 #   • does NOT validate format of returned archives
-#   • Does verify a packager that exited succesfully delivered a file
-#     titled <package_name>.tar.gz to the build output directory
-#   • Call project packagers with arguments ordered and formatted the same as
-#      every other packager
+#   • Does verify a project archive packager that exited succesfully delivered
+#     resulted in a file located at full path <out_path>/<package_name>.tar.gz
+#   • Call project archive packager with arguments ordered and formatted
+#     the same as every other packager
 #
-# Every project's packager script (or binary executable) is expected to:
+# Every project's archive packager (script or binary executable) is expected to:
 #
-#   • Be located at <project_name>/bin/pack
+#   • Be located at <repo_path>/<project_name>/bin/pack_archive
 #   • Indicate success by existing with exit code 0
 #   • Indicate Errors/Failures by exiting with an exit code that is not 0
 #   • Handle arguments in the same order & format as all other
-#     project pacckagers
+#     project archive packages
 #
 # Packager Arguments:
 #
@@ -61,7 +66,7 @@
 
 # projects to be packaged
 local BUILD_PROJECTS=(
-  # democ
+  democ
   democpp
   demonodejs
   demogolang
@@ -126,11 +131,14 @@ printf "BUILD_PATH:           %s\n" $BUILD_PATH
 #  Clean the build path
 [ -d "$BUILD_PATH" ] && rm -r "$BUILD_PATH"
 mkdir "$BUILD_PATH"
+printf "\n"
 
 #
 printf "PROJECTS: %d\n" ${#BUILD_PROJECTS}
 printf " - %s\n" $BUILD_PROJECTS
 printf "\n"
+
+CALL_DIR="$PWD"
 
 # For each project in the 'BUILD_PROJECTS' array, call the projects package script:
 for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
@@ -151,7 +159,9 @@ for ((i=1;i<=${#BUILD_PROJECTS};i++)); do
     return 2
   fi
 
+
   # Call the project packager
+  cd "$CALL_DIR"
   $PROJECT_PACKAGER "$PROJECT_ROOT" "$BUILD_PATH" "$VERSION"
   exit_code=$?
   if [ $exit_code -ne 0 ]; then
