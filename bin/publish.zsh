@@ -3,284 +3,222 @@
 # title   :publish.zsh
 # version :0.0.0
 # desc    :Publish distribution packages to a github release
-# usage   :See below header
-# exit    :0=success, 1=input error 2=execution error
 # auth    :Tate Hanawalt(tate@tatehanawalt.com)
 # date    :1621476898
 #==============================================================================
-# Builiding:
-# 1. Aquire dependencies:
-#   - Your Github Username
-#   - The full path of the th_sys directory
-#   - The full path of the homebrew-devtools directory
-#   - Github Personal Access Token for uploading the packages.
-#     Instructions:
-#       1. Log in to Github
-#       2. navigate to https://github.com/settings/tokens
-#          This url is: Github -> settings -> Developer Settings
-#       3. In the left menu select 'Personal Access tokens'
-#       4. On the right, select 'Generate New Token'
+# usage   :See below header
+# exit    :0=success, 1=input error 2=execution error
 #==============================================================================
 
-prnitf "PUBLISH\n"
-#     Instructions:
-#       1. Log in to Github
-#       2. navigate to https://github.com/settings/tokens
-#          This url is: Github -> settings -> Developer Settings
-#       3. In the left menu select 'Personal Access tokens'
-#       4. On the right, select 'Generate New Token'
-# - Github Personal Access Token for uploading the packages.
-# - Your Github Username
+# Check that the build script was called with the build version
+if [ ${#@} -ne 3 ]; then
+  printf "ERROR - th_sys/bin/publish.zsh incorrect arguments count. expects \$1=BUILD_OUT_PATH \$2=GITHUB_AUTH_TOKEN \$3=PUBLISH_VERSION Got ${#@} Arguments\n"
+  return 1
+fi
 
+# jq is a tool used to parse json strings from a shell/command line. We use it frequently
+# in the publishing logic
+JQ_PATH="$(which jq)"
+if [ -z "$JQ_PATH" ]; then
+  printf "ERROR - jq tool not found in current environment. check that jq is installed\n"
+  return 2
+fi
 
+# This is the directory path we expect the published archive files to exist in
+BUILD_OUT_PATH=$1
+if [ ! -d "$BUILD_OUT_PATH" ]; then
+  printf "ERROR - th_sys publish argument 1 is not a directory. Expects \$1=BUILD_OUT_PATH\n"
+  return 1
+fi
 
+# This is your account authorization token
+GITHUB_AUTH_TOKEN=$2
+if [ -z "$GITHUB_AUTH_TOKEN" ]; then
+  printf "ERROR - th_sys publish argument 2 length is 0. Expects \$2=GITHUB_AUTH_TOKEN\n"
+  return 1
+fi
 
+# This is your account authorization token
+PUBLISH_VERSION=$3
+if [ -z "$PUBLISH_VERSION" ]; then
+  printf "ERROR - th_sys publish argument 3 length is 0. Expects \$3=PUBLISH_VERSION\n"
+  return 1
+fi
 
-
-
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-# --------------------------------------------------------------------------------------------
-
-
-#  EVERYTHING BELOW THIS IS ZOMBIE CODE MIGRATING FROM THE th_sys/bin/build.zsh script
-
-
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-#=============================================================================================
-# --------------------------------------------------------------------------------------------
-
-
-
-
-
-
-# DETERMINE THE BUILD SHASUM for the output <out_path>/<project_name>.tar.gz
-# --------------------------------------------------------------------------------------------
-shaval=$(shasum -a 256 $out_path | sed 's/ .*//g')
+# Path to the repository
+REPOSITORY_ROOT_PATH=$(git rev-parse --show-toplevel 2>&1)
 if [ $? -ne 0 ]; then
-  printf "ERROR: project '$projects[$i]' shaval failed for out_path=$out_path\n"
-  return 2
+  printf "ERROR - publish.zsh executed in no git repository\n"
+  return 1
 fi
-if [ -z "$shaval" ]; then
-  printf "ERROR: project '$projects[$i]' SHASUM failed for out_path=$out_path\n"
-  return 2
+if [ ! -d "$REPOSITORY_ROOT_PATH" ]; then
+  printf "ERROR - th_sys publish.zsh git rev-parse return non directory path=$REPOSITORY_ROOT_PATH\n"
+  return 1
 fi
-SHA_MAP[$projects[$i]]="$shaval"
 
-# Destination path for the build output <project_name>.tar.gz
-# local out_path="$OUT_DIR/$projects[$i].tar.gz"
+GIT_REMOTE=$(git config --get remote.origin.url)
+if [ -z "$GIT_REMOTE" ]; then
+  printf "ERROR - th_sys publish.zsh failed to get GIT_REMOTE from \$: git config --get remote.origin.url\n"
+  return 1
+fi
 
+# Get the name of the repository
+REPOSITORY_NAME=$(basename -s .git $GIT_REMOTE)
+if [[ "$REPOSITORY_NAME" != "th_sys" ]]; then
+  printf "ERROR - th_sys publish.zsh must be executed in the th_sys repository\n"
+  return 1
+fi
 
+# Get the org of the repository
+GIT_REPO_ORG=$(basename $(dirname $GIT_REMOTE) | sed 's/.*://')
+if [ -z "$GIT_REPO_ORG" ]; then
+  printf "ERROR - th_sys publish.zsh failed to get REPO ORG from \$REPOSITORY_ROOT_PATH=%s\n" "$REPOSITORY_ROOT_PATH"
+  return 1
+fi
 
+# DO NOT DELETE - Useful for debugging
+# printf "PUBLISH:\n"
+# printf " - PUBLISH_VERSION=%s\n"          "$PUBLISH_VERSION"
+# printf " - BUILD_OUT_PATH=%s\n"           "$BUILD_OUT_PATH"
+# printf " - GITHUB_AUTH_TOKEN_LENGTH=%d\n" ${#GITHUB_AUTH_TOKEN}
+# printf " - REPOSITORY_ROOT_PATH=%s\n"     "$REPOSITORY_ROOT_PATH"
+# printf " - GIT_REMOTE=%s\n"               "$GIT_REMOTE"
+# printf " - REPOSITORY_NAME=%s\n"          "$REPOSITORY_NAME"
+# printf " - GIT_REPO_ORG=%s\n"             "$GIT_REPO_ORG"
+# printf " - JQ_PATH=%s\n"                  "$JQ_PATH"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# --------------------------------------------------------------------------------------------
-# 2. Define required publish parameters and values
-# --------------------------------------------------------------------------------------------
-# local ROOT_DIR=/Users/tatehanawalt/Desktop/th_sys # this will change in the future to a dynamically generated absolute path...
-local PUSH_REPO_NAME="th_sys"                     # Push release assets: - we can get this from git commands
-local init_dir=$(pwd)                             # This will be replaced by the root repository directory
-
-# External dependencies (SPECIFIED BY THE CALLER)
-local PUSH_UID=${BUILD_REPO_OWNER}
-local AUTH_TOKEN=${BUILD_REPO_TOKEN}
-local VERSION=${BUILD_VERSION}
-
-# --------------------------------------------------------------------------------------------
-
-
-
-local -A SHA_MAP
-
-# Call the build file for each project with that specific project's parameters (output path, project path, version etc...)
-
-# Call the build script for each project
-for ((i=1;i<=${#projects};i++)); do
-  local project_root="$ROOT_DIR/$projects[$i]" # Path to specific cli directory
-  local build_script="$project_root/bin/build" # Build Script
-  local out_path="$OUT_DIR/$projects[$i].tar.gz" # Destination path for the build output <project_name>.tar.gz
-
-  if [ ! -x "$build_script" ]; then
-    printf "ERROR: project '$projects[$i]' build script not found at $build_script\n"
-    return 2
-  fi
-  if [ -f "$out_path" ]; then
-    printf "ERROR: project '$projects[$i]' out path is an existing file system object\n"
-    return 2
-  fi
-
-  # --------------------------------------------------------------------------------------------
-  # CALL THE PROJECTS BUILD SCRIPT - passes the project name, the out path, and the version
-  # --------------------------------------------------------------------------------------------
-  $build_script "$project_root" "$out_path" "$VERSION"
-  exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    printf "ERROR: project '$projects[$i]' build script exit_code=$exit_code\n"
-    return 2
-  fi
-
-  # --------------------------------------------------------------------------------------------
-  # DETERMINE THE BUILD SHASUM for the output <out_path>/<project_name>.tar.gz
-  # --------------------------------------------------------------------------------------------
-  shaval=$(shasum -a 256 $out_path | sed 's/ .*//g')
-  if [ $? -ne 0 ]; then
-    printf "ERROR: project '$projects[$i]' shaval failed for out_path=$out_path\n"
-    return 2
-  fi
-  if [ -z "$shaval" ]; then
-    printf "ERROR: project '$projects[$i]' SHASUM failed for out_path=$out_path\n"
-    return 2
-  fi
-  SHA_MAP[$projects[$i]]="$shaval"
-
-  # --------------------------------------------------------------------------------------------
-  # This point indicastes .tar.gz build succeeded for project $projects[$i]
-  # --------------------------------------------------------------------------------------------
-done
-
-
-# Completed executing the build script for each project
-printf "COMPLETED PACKAGING TAR Archives for Packages:\n"
-for project in ${(k)SHA_MAP}; do
-  printf "- %-10s - %s\n" $project $SHA_MAP[$project]
-done
-
-# --------------------------------------------------------------------------------------------
-# Uploads a release asset to the designated parameter group destination
-# args: <1:user> <2:repo> <3:tag> <4:git_api_token> <5:file_path>
-upload_release_asset() {
-  if [ ${#@} -ne 5 ]; then
-    printf "ERROR: Argument count != 5... got ARGS=%d\n" ${#@}
-    return 1
-  fi
-
-  # pre-define method body scoped variables
-  local response_code=""
-  local request_data=""
-  local RELEASE_NUMBER=""
-
-  printf "- USER=%s\n" "$1"
-  printf "- REPO=%s\n" "$2"
-  printf "- TAG=%s\n" "$3"
-  printf "- AUTH_TOKEN_LENGTH=%d\n" ${#4}
-  printf "- FILE_PATH=%s\n" ${5}
-
-  # curl -s "https://api.github.com/repos/$1/$2/releases/$3"
-
-  # This checks for the specific release tag
-  response_code=$(curl -s --write-out '%{http_code}' --silent --output /dev/null "https://api.github.com/repos/$1/$2/releases/$3")
-  if [ ${response_code} -ne 200 ]; then
-    printf "ERROR: REPO_CHECK response code != 200... got %s\n" $response_code
-    return 2
-  fi
-  printf "✔ RELEASE_TAG=%s\n" $3
-
-  # This graps the release ID (which is not the tag)
-  request_data=$(curl -s "https://api.github.com/repos/$1/$2/releases/$3")
-  RELEASE_NUMBER=$(echo $request_data | jq '.id')
-  if [ -z "$RELEASE_NUMBER" ]; then
-    printf "ERROR: RELEASE_NUMBER failed to get a valid release code... got: %d\n" $RELEASE_NUMBER
-    return 2
-  fi
-
-  printf "✔ RELEASE_NUMBER=%d\n" $RELEASE_NUMBER
-
-  # This uploads the file to the release
-  request_data=$(curl --data-binary @"$5" \
-    -H "Authorization: token $4" \
-    -H "Content-Type: $(file -b --mime-type $5)" \
-    "https://uploads.github.com/repos/$1/$2/releases/$RELEASE_NUMBER/assets?name=$(basename $5)")
-
-  printf "UPLOAD_REQUEST_EXIT_CODE: $?\n"
-  printf "REQUEST_DATA:\n"
-  printf "%s\n" $request_data
+# Get the set of archive files in the specified path
+PUBLISH_ARCHIVES=( ${(@f)"$(find $BUILD_OUT_PATH -type f -maxdepth 1 | grep '.*\.tar.gz$')"} )
+if [ ${#PUBLISH_ARCHIVES} -lt 1 ]; then
+  printf "ERROR - th_sys publish.zsh BUILD_OUT_PATH does not contain any .tar.gz archives\n"
   return 0
-}
-
-
-# This checks that the passed auth api has the correct permissions
-local response_code=$(curl -s --write-out '%{http_code}' --silent --output /dev/null -H "Authorization: token $AUTH_TOKEN" "https://api.github.com/repos/$1/$2")
-if [ $response_code -ne 200 ]; then
-  printf "ERROR: AUTH response code != 200... got %s\n" $response_code
-  return 2
 fi
 
+# Set of maps used to store <PROJECT_NAME>=<various values>
+declare -A PATH_MAP # PATH_MAP will contain <PROJECT_NAME>=<project archive path>
+declare -A SHA_MAP  # SHA_MAP will contain <PROJECT_NAME>=<SHA 256 SUM of project archive path>
+declare -A URL_MAP  # Will contain <PROJECT_NAME>=<DOWNLOAD_URL - IF the archive was uploaded only>
+
+# Iterate through the archives (full paths stored in the PUBLISH_ARCHIVES array) and store
+# the values required to publish the archives
+for ARCHIVE_PATH in $PUBLISH_ARCHIVES; do
+  if [ ! -f "$ARCHIVE_PATH" ]; then
+    printf "ERROR: PUBLISH_ARCHIVES contains non file PATH=%s\n" "$ARCHIVE_PATH"
+    return 2
+  fi
+  PROJECT_NAME=$(echo $(basename $ARCHIVE_PATH) | sed 's/\..*//')
+  if [ -z "$PROJECT_NAME" ]; then
+    printf "ERROR: Failed to get project name from ARCHIVE_PATH=%s\n" "$ARCHIVE_PATH"
+    return 2
+  fi
+  SHA_256_SUM=$(shasum -a 256 "$ARCHIVE_PATH" | sed 's/ .*//g')
+  if [ $? -ne 0 ]; then
+    printf "ERROR: %s SHA_256_SUM failed for ARCHIVE_PATH=%s\n" "$SHA_256_SUM" "$ARCHIVE_PATH"
+    return 2
+  fi
+  if [ -z "$SHA_256_SUM" ]; then
+    printf "ERROR: %s SHA_256_SUM failed for ARCHIVE_PATH=%s\n" "$SHA_256_SUM" "$ARCHIVE_PATH"
+    return 2
+  fi
+  PATH_MAP[${PROJECT_NAME}]="$ARCHIVE_PATH"
+  SHA_MAP[${PROJECT_NAME}]="$SHA_256_SUM"
+  # DO NOT DELETE - Useful for debugging
+  # printf "PROJECT\n"
+  # printf " - NAME=%s\n" "$PROJECT_NAME"
+  # printf " - ARCHIVE_PATH=%s\n" "$ARCHIVE_PATH"
+  # printf " - SHA_256_SUM=%s\n" "$SHA_256_SUM"
+  # printf "\n"
+done
 
 
 
 
+# This section queries the existing set of releases, searches for the release tag we want
+# and collects the names of existing release assets
 
-# --------------------------------------------------------------------------------------------
-# This actually calls the function that uses shell to upload the release asset
-result_data="$(upload_release_asset $PUSH_UID $PUSH_REPO_NAME $VERSION $AUTH_TOKEN $TAR_TGT)"
-response_code=$?
-if [ $response_code -ne 0 ]; then
-  printf "UPLOAD_RELEASE_ASSET FAILED with exit code: %d...\n" $response_code
-  printf "OUTPUT:\n"
-  result_data=(${(@f)"$(echo $result_data)"})
-  printf "\t%s\n" $result_data
+# Get the JSON list of releases
+RELEASE_LIST_JSON=$(curl -s https://api.github.com/repos/$GIT_REPO_ORG/$REPOSITORY_NAME/releases)
+if [ -z "$RELEASE_LIST_JSON" ]; then
+  printf "ERROR - failed to get the list of releases\n" "$PUBLISH_VERSION"
   return 2
 fi
+# Get the release witht the tag_name matching the specified $PUBLISH_VERSION
+RELEASE_JSON_STR=$(echo $RELEASE_LIST_JSON | jq -c ".[] | select(.tag_name | contains(\"$PUBLISH_VERSION\"))" | jq)
+if [ -z "$RELEASE_JSON_STR" ]; then
+  printf "ERROR: Release with tag_name=%s not found.\n" "$PUBLISH_VERSION"
+  return 2
+fi
+# Search the list of releases for a release with tag_name=$PUBLISH_VERSION
+RELEASE_ID=$(echo $RELEASE_JSON_STR | jq '.id')
+if [ -z "$RELEASE_ID" ]; then
+  printf "ERROR: failed to retrieve the RELEASE_ID\n"
+  return 2
+fi
+# Get the set of existing release assets
+RELEASE_ASSETS_JSON_STR=$(echo $RELEASE_JSON_STR | jq '.assets')
 
-# --------------------------------------------------------------------------------------------
-# This point indicates the release asset has been successfully published
-#
-# return the: shasum, version, asset download url parameters?
-printf "UPLOAD_RELEASE_ASSET Completed successfully...\n"
-printf "%s\n" "$result_data"
-printf "TGT_SHASUM=%s\n" "$TGT_SHASUM"
-# --------------------------------------------------------------------------------------------
+# DO NOT DELETE - useful for debugging
+# printf "RELEASE_LIST_JSON:\n${RELEASE_LIST_JSON}\n\n"
+# printf "RELEASE_JSON_STR:\n${RELEASE_JSON_STR}\n\n"
+# printf "RELEASE_ASSETS_JSON_STR:\n${RELEASE_ASSETS_JSON_STR}\n"
 
+# Get the name of each existing release asset (this can absolutely return nothing when a release has no assets)
+EXISTING_RELEASE_ASSET_NAMES=( ${(@f)$(echo "$RELEASE_ASSETS_JSON_STR" | jq -r ".[] | .name")} )
+printf "\nEXISTING_RELEASE_ASSET_NAMES:\n"
+printf "- %s\n" $EXISTING_RELEASE_ASSET_NAMES
+printf "\n"
 
+PUBLISHED_PROJECTS=()
+for RELEASE_ASSET_NAME in $EXISTING_RELEASE_ASSET_NAMES; do
+  PUBLISHED_PROJECTS+=("$(echo $RELEASE_ASSET_NAME | sed 's/\..*//')")
+done
 
+NEWLY_PUBLISHED=()
+for PROJECT_NAME in ${(k)PATH_MAP}; do
+  local published=1
+  for PUBLISHED_PROJECT_NAME in $PUBLISHED_PROJECTS; do
+    [ "$PUBLISHED_PROJECT_NAME" != "$PROJECT_NAME" ] && continue
+    published=0
+    break
+  done
+  if [ $published -eq 0 ]; then
+    printf " ✘ %-10s - ALREADY PUBLISHED\n" "$PROJECT_NAME" && continue
+    continue
+  fi
+  PATH_BASE_NAME=$(basename "$PATH_MAP[$PROJECT_NAME]")
 
+  REQUEST_DATA=$(curl --data-binary @"$PATH_MAP[$PROJECT_NAME]" -H "Authorization: token $GITHUB_AUTH_TOKEN" -H "Content-Type: $(file -b --mime-type $PATH_MAP[$PROJECT_NAME])" "https://uploads.github.com/repos/$GIT_REPO_ORG/$REPOSITORY_NAME/releases/$RELEASE_ID/assets?name=$PATH_BASE_NAME")
+  DOWNLOAD_URL=$(echo $REQUEST_DATA | \
+    jq '.browser_download_url' | \
+    sed 's/^\"//' | \
+    sed 's/\"$//')
 
+  if [ -z "$DOWNLOAD_URL" ]; then
+    printf "Failed to get the browser download url after publishing $PROJECT_NAME...\n"
+    continue
+  fi
+  URL_MAP[$PROJECT_NAME]=$DOWNLOAD_URL
+  NEWLY_PUBLISHED+=($PROJECT_NAME)
+  printf " ✔ %-10s - PUBLISHED\n" "$PROJECT_NAME"
+done
 
-# return 0
-# printf "✔ PERMISSIONS_USER=%s\n" $1
-# printf "✔ PERMISSIONS_REPO=%s\n" $2
+NEWLY_PUBLISHED=(${(@f)$(printf "%s\n" ${(k)URL_MAP} | sort)})
+if [ ${#NEWLY_PUBLISHED} -lt 1 ]; then
+  printf "No new assets were published... exiting\n"
+  return 0
+fi
 
-# This script is used to generate the distribution packages for all the projects
-# in the th_sys repository
-# Projects in the th_sys repo are distributed in .tar.gz archive format
-# The archive for a project is generaged by invoking the <project>/bin/build script
-#Each package in the project is responsible for generating
-#          archive for distributioin.
-#          This script is responsible for invoking the buildi script for each project
-#          but this script does not do any compilation or any other type of packaging
-#          This script facilitates the bulid process for each project by:
-#          - cleaning previously generated builid if they exist
-#          - determing the path the project builds the
+printf "NEWLY_PUBLISHED (CSV):\n"
+printf "name,shasum,url\n"
+for NEW_PUBLISHED_PROJECT in $NEWLY_PUBLISHED; do
+  PROJECT_DOWNLOAD_URL=$URL_MAP[$NEW_PUBLISHED_PROJECT]
+  get_download_url_exit_code=$?
+  if [ $get_download_url_exit_code -ne 0 ]; then
+    printf "ERROR - getAssetBrowserURL failed for $NEW_PUBLISHED_PROJECT with exit code $get_download_url_exit_code\n"
+    continue
+  fi
+  printf "%s,%s,%s\n" "$NEW_PUBLISHED_PROJECT" "$SHA_MAP[$NEW_PUBLISHED_PROJECT]" "$PROJECT_DOWNLOAD_URL"
+done
 
-# packaging scripts are called with arguments:
-# 1. The full path to the project.
-# 2. A build output directory
-# 3. A build version
-#
-# The build version is expected to beintegrated in the packaged assets in some way.
-#
-# If packaging is successful the project packaging script places the archive
-# in the build output director witht he name "<project_name>.tar.gz"
-#
+printf "\n"
+return 0
