@@ -215,7 +215,7 @@ if [ ${#NEWLY_PUBLISHED} -lt 1 ]; then
   return 0
 fi
 
-printf "NEWLY_PUBLISHED (CSV):\n"
+printf "NEWLY_PUBLISHED (CSV):\n\n"
 printf "name,shasum,url\n"
 for NEW_PUBLISHED_PROJECT in $NEWLY_PUBLISHED; do
   PROJECT_DOWNLOAD_URL=$URL_MAP[$NEW_PUBLISHED_PROJECT]
@@ -226,6 +226,4 @@ for NEW_PUBLISHED_PROJECT in $NEWLY_PUBLISHED; do
   fi
   printf "%s,%s,%s\n" "$NEW_PUBLISHED_PROJECT" "$SHA_MAP[$NEW_PUBLISHED_PROJECT]" "$PROJECT_DOWNLOAD_URL"
 done
-
-printf "\n"
 return 0
