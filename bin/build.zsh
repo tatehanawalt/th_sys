@@ -75,7 +75,7 @@ local BUILD_PROJECTS=(
 )
 
 # Check that the build script was called with the build version
-if [ ${#@} -ne 1 ]; then
+if [ ${#@} -lt 1 ]; then
   printf "ERROR - th_sys/bin/build.zsh incorrect arguments count. expects \$1=BUILD_VERSION. got ${#@} Arguments\n"
   return 1
 fi
@@ -88,7 +88,7 @@ if [ -z "${#@}" ]; then
   return 1
 fi
 
-# We need a minimum of 1 project to go furth
+# We need a minimum of 1 project to go further
 if [ ${#BUILD_PROJECTS} -lt 1 ]; then
   printf "ERROR - th_sys/bin/build.zsh packager called with 0 projects\n"
   return 1
@@ -97,26 +97,38 @@ fi
 # Get the root path of the git repository
 REPOSITORY_ROOT_PATH=$(git rev-parse --show-toplevel)
 if [ -z "$REPOSITORY_ROOT_PATH" ]; then
-  printf "ERROR - th_sys build.zsh failed to locate the root repository path\n"
+  printf "ERROR - th_sys/bin/build.zsh failed to locate the root repository path\n"
   return 1
 fi
 
 # Get the name of the repository
 REPOSITORY_NAME=$(basename "$REPOSITORY_ROOT_PATH")
 if [[ "$REPOSITORY_NAME" != "th_sys" ]]; then
-  printf "ERROR - th_sys build.zsh must be executed in the th_sys repository\n"
+  printf "ERROR - th_sys/bin/build.zsh must be executed in the th_sys repository\n"
   return 1
 fi
 
-# buld out path
-local BUILD_PATH="$(mktemp -d)"
+# build out path
+if [ ${#@} -eq 2 ]; then # an out directory was specified
+  if [ ! -d "$2" ]; then # the specified out directory doesn't exist
+    printf "ERROR - th_sys/bin/build.zsh specified output directory doesn't exist\n"
+    return 1
+else
+     local BUILD_PATH="$2:A" # gives the full path
+  fi
+else # no out directory was given
+   local BUILD_PATH="$(mktemp -d)"
+fi
+
+# there is something in the directory..
 if [ -z "$BUILD_PATH" ]; then
   printf "ERROR - th-sys BUILd_PATH is somehow empty\n"
   return 2
 fi
+
 # do NOT remove anything that is not a direcctory...
 if [ -f "$BUILD_PATH" ]; then
-  printf "ERROR - th-sys build.zsh build_path is a file not a directory at $BUILD_PATH\n"
+  printf "ERROR - th-sys build.zsh BUILd_PATH is a file not a directory at $BUILD_PATH\n"
   return 1
 fi
 
