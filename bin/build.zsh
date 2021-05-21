@@ -83,7 +83,7 @@ fi
 local VERSION="$1"
 
 # make sure the build version is not nothing (TODO: add regex for SEMVER format)
-if [ -z "${#@}" ]; then
+if [ -z "$VERSION" ]; then
   printf "ERROR - th_sys/bin/build.zsh build version not specified\n"
   return 1
 fi
@@ -113,9 +113,8 @@ if [ ${#@} -eq 2 ]; then # an out directory was specified
   if [ ! -d "$2" ]; then # the specified out directory doesn't exist
     printf "ERROR - th_sys/bin/build.zsh specified output directory doesn't exist\n"
     return 1
-else
-     local BUILD_PATH="$2:A" # gives the full path
   fi
+  local BUILD_PATH="$2:A" # gives the full path
 else # no out directory was given
    local BUILD_PATH="$(mktemp -d)"
 fi
