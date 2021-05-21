@@ -130,9 +130,6 @@ for ARCHIVE_PATH in $PUBLISH_ARCHIVES; do
   # printf "\n"
 done
 
-
-
-
 # This section queries the existing set of releases, searches for the release tag we want
 # and collects the names of existing release assets
 
@@ -168,11 +165,13 @@ printf "\nEXISTING_RELEASE_ASSET_NAMES:\n"
 printf "- %s\n" $EXISTING_RELEASE_ASSET_NAMES
 printf "\n"
 
+# for existing published projects
 PUBLISHED_PROJECTS=()
 for RELEASE_ASSET_NAME in $EXISTING_RELEASE_ASSET_NAMES; do
   PUBLISHED_PROJECTS+=("$(echo $RELEASE_ASSET_NAME | sed 's/\..*//')")
 done
 
+# for pojects after they successfully upload
 NEWLY_PUBLISHED=()
 for PROJECT_NAME in ${(k)PATH_MAP}; do
   local published=1
@@ -186,17 +185,25 @@ for PROJECT_NAME in ${(k)PATH_MAP}; do
     continue
   fi
   PATH_BASE_NAME=$(basename "$PATH_MAP[$PROJECT_NAME]")
-
-  REQUEST_DATA=$(curl --data-binary @"$PATH_MAP[$PROJECT_NAME]" -H "Authorization: token $GITHUB_AUTH_TOKEN" -H "Content-Type: $(file -b --mime-type $PATH_MAP[$PROJECT_NAME])" "https://uploads.github.com/repos/$GIT_REPO_ORG/$REPOSITORY_NAME/releases/$RELEASE_ID/assets?name=$PATH_BASE_NAME")
+  PROJECT_ARCHIVE_PATH="$PATH_MAP[$PROJECT_NAME]"
+  if [ ! -f "$PROJECT_ARCHIVE_PATH" ]; then
+    printf " ✘ %-10s - ARCHIIVE PATH IS NOT AN EXISTING FILE\n" "$PROJECT_NAME" && continue
+    continue
+  fi
+  REQUEST_DATA=$(curl \
+    --data-binary @"$PATH_MAP[$PROJECT_NAME]" \
+    -H "Authorization: token $GITHUB_AUTH_TOKEN" \
+    -H "Content-Type: $(file -b --mime-type $PROJECT_ARCHIVE_PATH)" \
+    "https://uploads.github.com/repos/$GIT_REPO_ORG/$REPOSITORY_NAME/releases/$RELEASE_ID/assets?name=$PATH_BASE_NAME")
   DOWNLOAD_URL=$(echo $REQUEST_DATA | \
     jq '.browser_download_url' | \
     sed 's/^\"//' | \
     sed 's/\"$//')
-
   if [ -z "$DOWNLOAD_URL" ]; then
     printf "Failed to get the browser download url after publishing $PROJECT_NAME...\n"
     continue
   fi
+  # PROJECT IS OFFICIALLY NEWLY UPLOADED TO THE RELEASE
   URL_MAP[$PROJECT_NAME]=$DOWNLOAD_URL
   NEWLY_PUBLISHED+=($PROJECT_NAME)
   printf " ✔ %-10s - PUBLISHED\n" "$PROJECT_NAME"
