@@ -1,3 +1,3 @@
 #!/usr/bin/env zsh
 
-printf "\nDEMO ZSH\n\n"
+printf "\n\n\nDEMO ZSH\n\n\n"
