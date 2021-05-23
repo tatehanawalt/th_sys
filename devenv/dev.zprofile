@@ -22,7 +22,6 @@ function unlink_broken_syms {
 # -----------------------------------------------------------------------------
 # path of this script: ${0:A}
 # path of this dir:    ${0:A:h}
-
 case "$OSTYPE" in
 	darwin*) ;;
 	*)
@@ -197,6 +196,29 @@ if [ $? -ne 0 ]; then
 	fi
 fi
 printf "ⓘ\tcheck\t✔ rubocop\n"
+
+
+# CHECK jq
+# -----------------------------------------------------------------------------
+which jq &> /dev/null
+if [ $? -ne 0 ]; then
+	printf "ⓘ\tinit\tinstalling jq\n"
+	printf "ⓘ\tinit\t(may take a few minutes)\n"
+	printf "\n"
+	command brew install jq
+	printf "\n"
+
+	# if [ -z "$(apm ls | grep atom-beautify | sed 's/.* //')" ]; then
+	which jq &> /dev/null
+	if [ $? -ne 0 ]; then
+		printf "⚠\tinit\tbrew jq install failed\n" 1>&2
+		return 1
+	fi
+fi
+printf "ⓘ\tcheck\t✔ jq\n"
+
+
+
 
 # Directory Permissions:
 # -----------------------------------------------------------------------------
