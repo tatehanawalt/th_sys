@@ -29,9 +29,9 @@
 # 1. In your shell init script (~/.zshrc):
 # - Specify a hotpath directory 'HOT_PREFIX="some/directory"'
 # - Source this file with 'source "$HOT_PREFIX/coreenv/dev.zshrc"'
-
-printf "ⓘ core-infra coredev zshrc:\n"
-printf "ⓘ ${0:A:h}:\n"
+printf "\n"
+printf "ⓘ\tINIT\t${0:t:r}\n"
+printf "ⓘ\tsource\t${0:A:h}\n"
 
 # ZSH Initialization
 # -----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ fpath=("${0:A:r:h}/scripts" $fpath) # Add supporting script visibility
 
 # HOT PATHS - pulls non local projects on cd
 # -----------------------------------------------------------------------------
-HOT_PREFIX="$HOME/Documents/dev"
+HOT_PREFIX=${HOT_PREFIX:-"$HOME/Documents/dev"}
 
 # Brew prefix used in tap hot commands
 declare -A hot_cmd_type  # Command Type
@@ -50,6 +50,7 @@ autoload -Uz cd_hot_paths && cd_hot_paths
 
 push_hot_cmd brew devtools tatehanawalt
 push_hot_cmd git th_sys tatehanawalt
+# push_hot_cmd local shellinit tatehanawalt
 
 # VCS INFO - modify shell prompt to include Version Control System metadata
 # -----------------------------------------------------------------------------
@@ -140,7 +141,8 @@ function opendev {
 	printf "\n"
 	printf "- %s\n" $open_hotpaths
 	printf "\n"
-	function {
+
+  function {
 		for entry in $@; do
 			output=$(check_pull_hotpath $entry | tee /dev/tty)
 			to_path=$(echo $output | tail -1)
@@ -152,8 +154,10 @@ function opendev {
 			[ ${#openpaths} -eq 1 ] && atom -a $to_path
 		done
 	} $open_hotpaths
-	atom -a $openpaths
-	if [ ${#openpaths} -gt 0 ]; then
+
+  atom -a $openpaths
+
+  if [ ${#openpaths} -gt 0 ]; then
 		local keyset=($(echo ${(k)op_map} | tr ' ' '\n' | sort))
 		printf "\nopened:\n\n"
 		for k in $keyset; do
@@ -164,12 +168,12 @@ function opendev {
 	return
 }
 
+# DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
+# -------------------------------------------------------------------------
+printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
 printf "\n"
+
 printf "functions:\n"
 printf "\tmakehooks → Initialize hook functions in a .git repository\n"
 printf "\topendev   → opens hotpaths in atom (clone/tap if not found)\n"
 printf "\n"
-
-# DEV INIT COMPLETED - DO NOT ADD BELOW THIS LINE
-# -------------------------------------------------------------------------
-printf "core-infra devenv ✔\n"

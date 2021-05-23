@@ -1,8 +1,8 @@
 #!/usr/bin/env zsh
 
-printf "ⓘ core-infra coredev zprofile:\n"
-printf "ⓘ ${0:A:h}:\n"
-
+printf "\n"
+printf "ⓘ\tINIT\t${0:t:r}\n"
+printf "ⓘ\tsource\t${0:A:h}\n"
 
 # unlink broken symlinks
 function unlink_broken_syms {
@@ -197,7 +197,6 @@ if [ $? -ne 0 ]; then
 fi
 printf "ⓘ\tcheck\t✔ rubocop\n"
 
-
 # CHECK jq
 # -----------------------------------------------------------------------------
 which jq &> /dev/null
@@ -207,7 +206,6 @@ if [ $? -ne 0 ]; then
 	printf "\n"
 	command brew install jq
 	printf "\n"
-
 	# if [ -z "$(apm ls | grep atom-beautify | sed 's/.* //')" ]; then
 	which jq &> /dev/null
 	if [ $? -ne 0 ]; then
@@ -217,10 +215,14 @@ if [ $? -ne 0 ]; then
 fi
 printf "ⓘ\tcheck\t✔ jq\n"
 
-
-
-
 # Directory Permissions:
 # -----------------------------------------------------------------------------
 [ -d /usr/local/share/zsh ] && chmod -R 755 /usr/local/share/zsh
 [ -d site-functions ] && chmod -R 755 site-functions
+
+
+
+# DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
+# -------------------------------------------------------------------------
+printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
+printf "\n"

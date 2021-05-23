@@ -9,7 +9,7 @@ TLDR - Add the following to your Shell profile init script `($HOME/.zprofile)`
 ```
 # Config the dev env
 HOT_PREFIX="$HOME/Desktop"
-source "$HOT_PREFIX/coreenv/dev.zprofile"
+source "$HOT_PREFIX/coreenv/zprofile"
 ```
 
 #### Atom:

@@ -13,7 +13,6 @@
 # the buffer for hot paths and executes the hot path if the cd'd path is not valid for cd.
 # a.k.a If I call `cd <hotpath>` and `<hotpath>` doesn't exist in my env, I execute the hotpath
 # definition. if `<hotpath>` is a valid cd argument then the system cd command runs as usual.
-
 function hot_paths() {
   echo ${(k)hot_cmd_org} | tr ' ' '\n' | sort
 }
@@ -33,6 +32,7 @@ function push_hot_cmd {
   case $1 in
     brew) ;;
     git) ;;
+    local) ;;
     *)
       printf "push_hot_cmd unhandled type type=$1\n" 1>&2
       return 1
@@ -59,6 +59,14 @@ function hot_path_dst_dir() {
         hot_cmd_path[$1]="$HOT_BREW_PREF_PATH/Homebrew/Library/Taps/$hot_cmd_org[$1]/homebrew-$1"
         ;;
       git)
+        [ -z "$HOT_PREFIX" ] && HOT_PREFIX="$HOME/Desktop"
+        if [ ! -d "$HOT_PREFIX" ]; then
+          printf "ERROR - Param HOT_PREFIX is not a directory\n" 1>&2
+          return 1
+        fi
+        hot_cmd_path[$1]="$HOT_PREFIX/$1"
+        ;;
+      local)
         [ -z "$HOT_PREFIX" ] && HOT_PREFIX="$HOME/Desktop"
         if [ ! -d "$HOT_PREFIX" ]; then
           printf "ERROR - Param HOT_PREFIX is not a directory\n" 1>&2
@@ -94,12 +102,21 @@ function hot_path_pull_cmd() {
         fi
         pull_cmd=(git clone "git@github.com:$hot_cmd_org[$1]/$1.git" $dst_path)
         ;;
+      local)
+        dst_path=$(hot_path_dst_dir $1)
+        local result=$?
+        if [ $result -ne 0 ] || [ -z "$dst_path" ]; then
+          printf "ERROR - Failed to get hot path pull destination... $1\n" 1>&2
+          return 2
+        fi
+        pull_cmd=(test -d $dst_path)
+        ;;
       *)
         printf "ERROR - Hot path pull command type not recognized... ${hot_cmd_type[1]}\n" 1>&2
         return 1
         ;;
     esac
-    hot_cmd_pull[$1]="$pull_cmd"
+    hot_cmd_pull[$1]=$pull_cmd
   fi
   printf "$hot_cmd_pull[$1]\n"
   return 0
