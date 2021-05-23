@@ -48,15 +48,12 @@ declare -A hot_cmd_path   # Command Org
 declare -A hot_cmd_pull   # Command Org
 autoload -Uz cd_hot_paths && cd_hot_paths
 
-push_hot_cmd brew brewcore core-infra
 push_hot_cmd brew devtools tatehanawalt
-push_hot_cmd git coredev Core-Infra
 push_hot_cmd git th_sys tatehanawalt
 
 # VCS INFO - modify shell prompt to include Version Control System metadata
 # -----------------------------------------------------------------------------
 # autoload -Uz config_dev_prompt && config_dev_prompt
-
 
 # Make Hooks - initialize hook functions in a .git repository
 # -----------------------------------------------------------------------------
@@ -135,6 +132,7 @@ function makehooks() {
   return 0
 }
 
+# Open the hotpath directories in 1 atom application window
 function opendev {
 	local openpaths=()
 	local open_hotpaths=($(hot_paths | sort))

@@ -16,15 +16,16 @@
 
 function hot_paths() {
   echo ${(k)hot_cmd_org} | tr ' ' '\n' | sort
-
-
-  # getpaths=($(echo ${(k)hot_cmd_org} | tr ' ' '\n' | sort))
-  # for hp in $getpaths; do
-  #   printf "%-10s %s\n" $hp $(hot_path_dst_dir $hp)
-  # done
 }
 
-# hotpath type label, org,
+# hotpath
+# Acdd a hotpath command
+#
+# ARGS:
+# $1 type  - [git,brew]
+# $2 label - name of the hot command. used for pulling the code from brew or
+#            git and for the cd command `cd <label>`
+# $3 org   - github organization name
 function push_hot_cmd {
   [ ${#@} -ne 3 ] && return 1
   # Check if hot command is already defined
@@ -46,7 +47,6 @@ function hot_path_dst_dir() {
   [ ${#@} -lt 1 ] || [ -z "$1" ] && return 1
   [ -z "$hot_cmd_type[$1]" ]&& return 1
   [ -z "$hot_cmd_org[$1]" ]&& return 1
-
   # Generate the pull path if we haven't yet...
   if [ -z "$hot_cmd_path[$1]" ]; then
     case "$hot_cmd_type[$1]" in
