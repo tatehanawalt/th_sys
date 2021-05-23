@@ -48,10 +48,6 @@ declare -A hot_cmd_path   # Command Org
 declare -A hot_cmd_pull   # Command Org
 autoload -Uz cd_hot_paths && cd_hot_paths
 
-push_hot_cmd brew devtools tatehanawalt
-push_hot_cmd git th_sys tatehanawalt
-# push_hot_cmd local shellinit tatehanawalt
-
 # VCS INFO - modify shell prompt to include Version Control System metadata
 # -----------------------------------------------------------------------------
 # autoload -Uz config_dev_prompt && config_dev_prompt
@@ -141,7 +137,6 @@ function opendev {
 	printf "\n"
 	printf "- %s\n" $open_hotpaths
 	printf "\n"
-
   function {
 		for entry in $@; do
 			output=$(check_pull_hotpath $entry | tee /dev/tty)
@@ -154,9 +149,7 @@ function opendev {
 			[ ${#openpaths} -eq 1 ] && atom -a $to_path
 		done
 	} $open_hotpaths
-
   atom -a $openpaths
-
   if [ ${#openpaths} -gt 0 ]; then
 		local keyset=($(echo ${(k)op_map} | tr ' ' '\n' | sort))
 		printf "\nopened:\n\n"
@@ -168,6 +161,8 @@ function opendev {
 	return
 }
 
+# autoload -Uz devinfo
+
 # DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
 # -------------------------------------------------------------------------
 printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
@@ -176,4 +171,5 @@ printf "\n"
 printf "functions:\n"
 printf "\tmakehooks → Initialize hook functions in a .git repository\n"
 printf "\topendev   → opens hotpaths in atom (clone/tap if not found)\n"
+printf "\tdevinfo   → show useful developer information\n"
 printf "\n"
