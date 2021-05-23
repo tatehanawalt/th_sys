@@ -1,0 +1,177 @@
+#!/usr/bin/env zsh
+# coredev - Core-infra developer environment zsh initialization script
+# @auth Tate Hanawalt - tate@tatehanawalt.com
+
+# Usage:
+# -----------------------------------------------------------------------------
+# Source this file in your shell init script (see install steps)
+#
+# When you open your prompt this script will print a string to indicate the
+# shell successfully soured this script
+#
+# The first time this script runs will install all dependencies and may take
+# some time
+
+# Simple Install:
+# -----------------------------------------------------------------------------
+# Source this file in your shell init script by sourcing this file in your
+# shell initialization script (a.k.a ~/.zshrc)
+#
+# source "<path/to/this/directory>/dev.zshrc"
+
+# Advanced Install:
+# -----------------------------------------------------------------------------
+# HOT PATHS requires you define a directory where
+# repos are cloned if they don't exist. You can
+# use this to specify the location of this dev
+# init file dev.zshrc
+#
+# 1. In your shell init script (~/.zshrc):
+# - Specify a hotpath directory 'HOT_PREFIX="some/directory"'
+# - Source this file with 'source "$HOT_PREFIX/coreenv/dev.zshrc"'
+
+printf "ⓘ core-infra coredev zshrc:\n"
+printf "ⓘ ${0:A:h}:\n"
+
+# ZSH Initialization
+# -----------------------------------------------------------------------------
+fpath=("${0:A:r:h}/scripts" $fpath) # Add supporting script visibility
+
+# HOT PATHS - pulls non local projects on cd
+# -----------------------------------------------------------------------------
+HOT_PREFIX="$HOME/Documents/dev"
+
+# Brew prefix used in tap hot commands
+declare -A hot_cmd_type  # Command Type
+declare -A hot_cmd_org   # Command Org
+declare -A hot_cmd_path   # Command Org
+declare -A hot_cmd_pull   # Command Org
+autoload -Uz cd_hot_paths && cd_hot_paths
+
+push_hot_cmd brew brewcore core-infra
+push_hot_cmd brew devtools tatehanawalt
+push_hot_cmd git coredev Core-Infra
+push_hot_cmd git th_sys tatehanawalt
+
+# VCS INFO - modify shell prompt to include Version Control System metadata
+# -----------------------------------------------------------------------------
+# autoload -Uz config_dev_prompt && config_dev_prompt
+
+
+# Make Hooks - initialize hook functions in a .git repository
+# -----------------------------------------------------------------------------
+function makehooks() {
+  local git_path=$(git rev-parse --show-toplevel)
+
+  if [ ! -d $git_path ]; then
+    printf "makehooks called from no repo path"  1>&2
+    return 1
+  fi
+
+  printf "git_path=%s\n" "$git_path"
+
+	if [ ! -d "$git_path/.git" ]; then
+    printf "makehooks .git directory not found"  1>&2
+    return 1
+  fi
+
+  if [ -f "$git_path/.git/hooks" ]; then
+    printf "$git_path/.git/hooks is a file... it should be a directory\n"  1>&2
+    return 1
+  fi
+  if [ -L "$git_path/.git/hooks" ]; then
+    if [ ! -e "$git_path/.git/hooks" ] ; then
+      printf "removing proken symlink $git_path/.git/hooks\n"
+      unlink "$git_path/.git/hooks"
+    fi
+  fi
+  if [ -d "$git_path/.git/hooks" ]; then
+    printf ".git/hooks is an existing directory. skipping hook initialize\n"
+    return
+  fi
+
+	hook_fns=(
+		applypatch-msg
+		commit-msg
+		fsmonitor-watchman
+		post-update
+		pre-applypatch
+		pre-commit
+		pre-merge-commit
+		pre-push
+		pre-rebase
+		pre-receive
+		prepare-commit-msg
+		push-to-checkout
+		update
+	)
+
+	if [ -f "$git_path/.githooks" ]; then
+    printf "Found file. Path must be a directory  or not exist at git_path/.githooks\n" 1>&2
+    return 1
+  fi
+
+	if [ ! -d "$git_path/.githooks" ]; then
+		mkdir "$git_path/.githooks"
+		printf " + .githooks\n"
+	fi
+
+  for fn in $hook_fns; do
+
+    if [ -L "$git_path/.githooks/$fn" ]; then
+      if [ ! -e "$git_path/.githooks/$fn" ] ; then
+        printf "removing proken symlink $git_path/.githooks/$fn\n"
+        unlink "$git_path/.githooks/$fn"
+      fi
+    fi
+
+    if [ ! -f "$git_path/.githooks/$fn" ]; then
+      echo '#!/bin/sh\n\necho "HOOK: ${0:A} $@"' > "$git_path/.githooks/$fn"
+      chmod +x "$git_path/.githooks/$fn"
+      printf " + hook .githooks/$fn\n"
+    fi
+  done
+  ln -s "$git_path/.githooks" "$git_path/.git/hooks"
+  return 0
+}
+
+function opendev {
+	local openpaths=()
+	local open_hotpaths=($(hot_paths | sort))
+	local -A op_map
+	printf "\n"
+	printf "- %s\n" $open_hotpaths
+	printf "\n"
+	function {
+		for entry in $@; do
+			output=$(check_pull_hotpath $entry | tee /dev/tty)
+			to_path=$(echo $output | tail -1)
+			[ $? -ne 0 ] && printf "$1 check_pull_hotpath failed\n" 1>&2 && continue
+			[ -z "$to_path" ] || [ ! -d "$to_path" ] && printf "$1 check_pull_hotpath failed\n" 1>&2 && continue
+			openpaths+=($to_path)
+			op_map[$entry]=$to_path
+			# Open the first path that is being opened to preload atom
+			[ ${#openpaths} -eq 1 ] && atom -a $to_path
+		done
+	} $open_hotpaths
+	atom -a $openpaths
+	if [ ${#openpaths} -gt 0 ]; then
+		local keyset=($(echo ${(k)op_map} | tr ' ' '\n' | sort))
+		printf "\nopened:\n\n"
+		for k in $keyset; do
+			printf "- %s\t%s\n" $k $op_map[$k]
+		done
+		printf "\n"
+	fi
+	return
+}
+
+printf "\n"
+printf "functions:\n"
+printf "\tmakehooks → Initialize hook functions in a .git repository\n"
+printf "\topendev   → opens hotpaths in atom (clone/tap if not found)\n"
+printf "\n"
+
+# DEV INIT COMPLETED - DO NOT ADD BELOW THIS LINE
+# -------------------------------------------------------------------------
+printf "core-infra devenv ✔\n"

@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+#
+# dev_prompt
+# @auth Tate Hanawalt - tate@tatehanawalt.com
+#
+# Reference: http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html
+
+setopt prompt_subst          # Enable prompt substitiutions
+autoload -Uz vcs_info        # Initialize vcs info
+precmd_functions+=(vcs_info) #
+
+#
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' actionformats "%r/%S %b %m%u%c "
+zstyle ':vcs_info:git*' formats "%r/%S %b (%a) %m%u%c "
+
+PROMPT='${vcs_info_msg_0_}%# '
