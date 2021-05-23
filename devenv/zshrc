@@ -167,7 +167,6 @@ function opendev {
 # -------------------------------------------------------------------------
 printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
 printf "\n"
-
 printf "functions:\n"
 printf "\tmakehooks → Initialize hook functions in a .git repository\n"
 printf "\topendev   → opens hotpaths in atom (clone/tap if not found)\n"
