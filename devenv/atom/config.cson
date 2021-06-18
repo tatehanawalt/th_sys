@@ -1,0 +1,31 @@
+"*":
+  core:
+    audioBeep: false
+    automaticallyUpdate: false
+    disabledPackages: [
+      "minimap"
+    ]
+    excludeVcsIgnoredPaths: false
+    restorePreviousWindowsOnStart: "no"
+    simpleFullScreenWindows: true
+    telemetryConsent: "no"
+    titleBar: "custom-inset"
+  editor:
+    fontSize: 17
+    invisibles:
+      cr: false
+      eol: false
+    showIndentGuide: true
+    showInvisibles: true
+  "exception-reporting":
+    userId: "4884b25e-17c5-4a56-af65-b533f3038eb7"
+  minimap:
+    adjustMinimapWidthOnlyIfSmaller: false
+    adjustMinimapWidthToSoftWrap: false
+    displayPluginsControls: false
+    independentMinimapScroll: true
+    minimapScrollIndicator: false
+    moveCursorOnMinimapClick: true
+    smoothScrolling: true
+  welcome:
+    showOnStartup: false

@@ -1,0 +1,19 @@
+"*":
+  core:
+    audioBeep: false
+    automaticallyUpdate: false
+    excludeVcsIgnoredPaths: false
+    restorePreviousWindowsOnStart: "no"
+    simpleFullScreenWindows: true
+    telemetryConsent: "no"
+    titleBar: "custom-inset"
+  editor:
+    invisibles:
+      cr: false
+      eol: false
+    showIndentGuide: true
+    showInvisibles: true
+  "exception-reporting":
+    userId: "4884b25e-17c5-4a56-af65-b533f3038eb7"
+  welcome:
+    showOnStartup: false

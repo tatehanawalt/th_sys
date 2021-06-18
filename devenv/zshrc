@@ -29,9 +29,11 @@
 # 1. In your shell init script (~/.zshrc):
 # - Specify a hotpath directory 'HOT_PREFIX="some/directory"'
 # - Source this file with 'source "$HOT_PREFIX/coreenv/dev.zshrc"'
+script_name=${0:t:r}
+script_dir=${0:A:h}
 printf "\n"
-printf "ⓘ\tINIT\t${0:t:r}\n"
-printf "ⓘ\tsource\t${0:A:h}\n"
+printf "ⓘ\tINIT\t$script_name\n"
+printf "ⓘ\tDIR\t$script_dir\n"
 
 # ZSH Initialization
 # -----------------------------------------------------------------------------
@@ -68,7 +70,6 @@ function makehooks() {
     printf "makehooks .git directory not found"  1>&2
     return 1
   fi
-
   if [ -f "$git_path/.git/hooks" ]; then
     printf "$git_path/.git/hooks is a file... it should be a directory\n"  1>&2
     return 1
@@ -111,7 +112,6 @@ function makehooks() {
 	fi
 
   for fn in $hook_fns; do
-
     if [ -L "$git_path/.githooks/$fn" ]; then
       if [ ! -e "$git_path/.githooks/$fn" ] ; then
         printf "removing proken symlink $git_path/.githooks/$fn\n"
@@ -165,7 +165,10 @@ function opendev {
 
 # DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
 # -------------------------------------------------------------------------
-printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
+
+# DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
+# -------------------------------------------------------------------------
+printf "ⓘ\tINIT\t✔ $script_name\n"
 printf "\n"
 printf "functions:\n"
 printf "\tmakehooks → Initialize hook functions in a .git repository\n"

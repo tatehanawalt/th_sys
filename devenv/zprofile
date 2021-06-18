@@ -1,8 +1,16 @@
 #!/usr/bin/env zsh
 
+# TODOS:
+# -----------------------------------------------------------------------------
+# 	brew tap homebrew/cask-fonts
+# 	brew install --cask font-fira-code
+
+script_name=${0:t:r}
+script_dir=${0:A:h}
 printf "\n"
-printf "ⓘ\tINIT\t${0:t:r}\n"
-printf "ⓘ\tsource\t${0:A:h}\n"
+printf "ⓘ\tINIT\t$script_name\n"
+printf "ⓘ\tDIR\t$script_dir\n"
+
 
 # unlink broken symlinks
 function unlink_broken_syms {
@@ -18,6 +26,7 @@ function unlink_broken_syms {
 	return 0
 }
 
+
 # INFO:
 # -----------------------------------------------------------------------------
 # path of this script: ${0:A}
@@ -31,7 +40,8 @@ case "$OSTYPE" in
 esac
 printf "ⓘ\tcheck\t✔ darwin\n"
 
-# CHECK zsh
+
+# CHECK env zsh
 # -----------------------------------------------------------------------------
 if [ "${SHELL#*zsh}" = "$SHELL" ]; then
 	printf "⚠\tinit\tSHELL not zsh\n" 1>&2
@@ -39,7 +49,8 @@ if [ "${SHELL#*zsh}" = "$SHELL" ]; then
 fi
 printf "ⓘ\tcheck\t✔ zsh\n"
 
-# CHECK git
+
+# CHECK env git
 # -----------------------------------------------------------------------------
 command git &> /dev/null
 if [ $? -ne 1 ]; then
@@ -48,7 +59,8 @@ if [ $? -ne 1 ]; then
 	return 1
 fi
 
-# CHECK brew
+
+# CHECK env brew
 # -----------------------------------------------------------------------------
 # command brew writes usage (exit code 1) if brew is on the system
 command brew &> /dev/null
@@ -66,7 +78,8 @@ if [ $? -ne 1 ]; then
 fi
 printf "ⓘ\tcheck\t✔ brew\n"
 
-# CHECK git (non apple)
+
+# CHECK env git (non apple)
 # -----------------------------------------------------------------------------
 GIT_VER_STR=$(command git --version)
 if [ "${GIT_VER_STR#*Apple}" != "$GIT_VER_STR" ]; then
@@ -89,115 +102,27 @@ git config --global pull.ff only              # fast forward
 git config --global push.default current      # automatically set upstream
 printf "ⓘ\tcheck\t✔ git\n"
 
-# CHECK atom
-# -----------------------------------------------------------------------------
-command apm &> /dev/null
-if [ $? -ne 0 ]; then
-	printf "ⓘ\tinit\tatom not detected\n"
-	printf "ⓘ\tinit\tatom installing\n"
+
+BASH_VER_STR=$(command bash --version)
+if [ "${BASH_VER_STR#*apple}" != "$BASH_VER_STR" ]; then
+	printf "ⓘ\tinit\tbash detected apple\n" 1>&2
+	printf "ⓘ\tinit\tinstalling bash (non-apple)\n" 1>&2
 	printf "\n"
-	brew install atom
+	command brew install bash
+	bash_install_exit_code=$?
 	printf "\n"
-	command apm &> /dev/null
-	if [ $? -ne 0 ]; then
-		printf "⚠\tinit\tatom install failed\n" 1>&2
+	if [ $brew_install_exit_code -ne 0 ]; then
+		printf "⚠\tinit\tbash non-apple install failed\n" 1>&2
 		return 1
 	fi
+	printf "ⓘ\tinit\tinstalled non-apple bash\n" 1>&2
+	printf "ⓘ\tinit\trestart your shell\n" 1>&2
+	return 1
 fi
-printf "ⓘ\tcheck\t✔ atom\n"
+printf "ⓘ\tcheck\t✔ bash\n"
 
-# CHECK atom styles.less file
-# -----------------------------------------------------------------------------
-atom_styles_path="$HOME/.atom/styles.less"
-unlink_broken_syms $atom_styles_path &> /dev/null
-if [ -f "${atom_styles_path:A}" ]; then
-	if [ "${atom_styles_path:A}" != "${0:A:h}/styles.less" ]; then
-		[ -L "$atom_styles_path" ] && unlink "$atom_styles_path"
-		[ -f "$atom_styles_path" ] && rm -f "$atom_styles_path"
-	fi
-fi
-if [ ! -f "$atom_styles_path" ]; then
-	ln -s "${0:A:h}/styles.less" "$atom_styles_path"
-	printf "ⓘ\tcheck\tsymlinked styles.less ~/.atom/styles.less\n"
-fi
-printf "ⓘ\tcheck\t✔ atom styles.less\n"
 
-# CHECK atom minimal
-# -----------------------------------------------------------------------------
-if [ -z "$(apm ls | grep minimap | sed 's/.* //')" ]; then
-	printf "ⓘ\tinit\tinstalling atom minimap\n"
-	printf "ⓘ\tinit\t(may take a few minutes)\n"
-	printf "\n"
-	command apm install minimap
-	printf "\n"
-	if [ -z "$(apm ls | grep minimap | sed 's/.* //')" ]; then
-		printf "⚠\tinit\tatom minimap install failed\n" 1>&2
-		return 1
-	fi
-fi
-printf "ⓘ\tcheck\t✔ atom minimap\n"
-
-# CHECK atom teletype
-# -----------------------------------------------------------------------------
-if [ -z "$(apm ls | grep teletype | sed 's/.* //')" ]; then
-	printf "ⓘ\tinit\tinstalling atom teletype package\n"
-	printf "ⓘ\tinit\t(may take a few minutes)\n"
-	printf "\n"
-	command apm install teletype
-	printf "\n"
-	if [ -z "$(apm ls | grep teletype | sed 's/.* //')" ]; then
-		printf "⚠\tinit\tatom teletype install failed\n" 1>&2
-		return 1
-	fi
-fi
-printf "ⓘ\tcheck\t✔ atom teletype\n"
-
-# CHECK atom atom-beautify
-# -----------------------------------------------------------------------------
-if [ -z "$(apm ls | grep atom-beautify | sed 's/.* //')" ]; then
-	printf "ⓘ\tinit\tinstalling atom atom-beautify\n"
-	printf "ⓘ\tinit\t(may take a few minutes)\n"
-	printf "\n"
-	command apm install atom-beautify
-	printf "\n"
-	if [ -z "$(apm ls | grep atom-beautify | sed 's/.* //')" ]; then
-		printf "⚠\tinit\tatom atom-beautify install failed\n" 1>&2
-		return 1
-	fi
-fi
-printf "ⓘ\tcheck\t✔ atom atom-beautify\n"
-
-# CHECK gem env (required for rubocop)
-# -----------------------------------------------------------------------------
-if [ -z "$GEM_HOME" ]; then
-	export GEM_HOME="$HOME/.gem"
-	if [ ! -d "$GEM_HOME" ]; then
-		printf "⚠\tinit\tGEM_HOME=%s\n" "$GEM_HOME" 1>&2
-		printf "⚠\tinit\tpath is not a directory\n" 1>&2
-		return 1
-	fi
-fi
-# Add gem home to path
-[ "${PATH#*$GEM_HOME}" = "$PATH" ] && PATH="$GEM_HOME/bin:$PATH"
-
-# CHECK rubocop
-# -----------------------------------------------------------------------------
-command which rubocop &> /dev/null
-if [ $? -ne 0 ]; then
-	printf "ⓘ\tinit\tinstalling rubocop\n"
-	printf "ⓘ\tinit\t(may take a few minutes)\n"
-	printf "\n"
-	command gem install rubocop
-	printf "\n"
-	command which rubocop &> /dev/null
-	if [ $? -ne 0 ]; then
-		printf "⚠\tinit\trubocop install failed\n" 1>&2
-		return 1
-	fi
-fi
-printf "ⓘ\tcheck\t✔ rubocop\n"
-
-# CHECK jq
+# CHECK brew jq
 # -----------------------------------------------------------------------------
 which jq &> /dev/null
 if [ $? -ne 0 ]; then
@@ -215,14 +140,130 @@ if [ $? -ne 0 ]; then
 fi
 printf "ⓘ\tcheck\t✔ jq\n"
 
+
+# CHECK env atom
+# -----------------------------------------------------------------------------
+command apm &> /dev/null
+if [ $? -ne 0 ]; then
+	printf "ⓘ\tinit\tatom not detected\n"
+	printf "ⓘ\tinit\tatom installing\n"
+	printf "\n"
+	brew install atom
+	printf "\n"
+	command apm &> /dev/null
+	if [ $? -ne 0 ]; then
+		printf "⚠\tinit\tatom install failed\n" 1>&2
+		return 1
+	fi
+fi
+printf "ⓘ\tcheck\t✔ atom\n"
+
+
+# CHECK ATOM CONFIG FILES $@
+# -----------------------------------------------------------------------------
+src_files=(
+	config.cson
+	styles.less
+)
+function {
+	for pkg in $@; do
+		atom_styles_path="$HOME/.atom/$pkg"
+		source_file_path="$script_dir/atom/$pkg"
+		#  make sure local repo has styles file
+		if [ ! -f "$source_file_path" ]; then
+			printf "⚠\tinit\tsrc missing atom $pkg at $source_file_path\n" 1>&2
+			continue
+		fi
+		unlink_broken_syms $atom_styles_path &> /dev/null
+		if [ -f "${atom_styles_path:A}" ]; then
+			if [ "${atom_styles_path:A}" != "$source_file_path" ]; then
+				if [ -L "$atom_styles_path" ]; then
+					unlink "$atom_styles_path"
+					printf "ⓘ\tinit\tunlinked conflict $pkg\n"
+				fi
+				if [ -f "$atom_styles_path" ]; then
+					rm -f "$atom_styles_path"
+					printf "ⓘ\tinit\tremoved conflict $pkg\n"
+				fi
+			fi
+		fi
+		if [ ! -f "$atom_styles_path" ]; then
+			ln -s "$source_file_path" "$atom_styles_path"
+			printf "ⓘ\tcheck\tsymlinked $pkg ~/.atom/$pkg\n"
+		fi
+		printf "ⓘ\tcheck\t✔ atom $pkg\n"
+	done
+} $src_files
+
+
+# CHECK ATOM PACKAGE $@
+# -----------------------------------------------------------------------------
+apm_pkgs=(
+	atom-beautify
+	intentions
+	busy-signal
+	linter
+	linter-js-yaml
+	linter-ui-default
+	minimap
+	teletype
+)
+function {
+	for pkg in $@; do
+		if [ -z "$(apm ls | grep $pkg | sed 's/.* //')" ]; then
+			printf "ⓘ\tinit\tinstalling atom $pkg\n"
+			printf "ⓘ\tinit\t(may take a few minutes)\n"
+			printf "\n"
+			command apm install $pkg
+			printf "\n"
+			if [ -z "$(apm ls | grep $pkg | sed 's/.* //')" ]; then
+				printf "⚠\tinit\tatom $pkg install failed\n" 1>&2
+				return 1
+			fi
+		fi
+		printf "ⓘ\tcheck\t✔ atom $pkg\n"
+	done
+} $apm_pkgs
+
+
+# CHECK gem env (required for rubocop)
+# -----------------------------------------------------------------------------
+if [ -z "$GEM_HOME" ]; then
+	export GEM_HOME="$HOME/.gem"
+	if [ ! -d "$GEM_HOME" ]; then
+		printf "⚠\tinit\tGEM_HOME=%s\n" "$GEM_HOME" 1>&2
+		printf "⚠\tinit\tpath is not a directory\n" 1>&2
+		return 1
+	fi
+fi
+# Add gem home to path
+[ "${PATH#*$GEM_HOME}" = "$PATH" ] && PATH="$GEM_HOME/bin:$PATH"
+
+# CHECK ruby rubocop
+# -----------------------------------------------------------------------------
+command which rubocop &> /dev/null
+if [ $? -ne 0 ]; then
+	printf "ⓘ\tinit\tinstalling rubocop\n"
+	printf "ⓘ\tinit\t(may take a few minutes)\n"
+	printf "\n"
+	command gem install rubocop
+	printf "\n"
+	command which rubocop &> /dev/null
+	if [ $? -ne 0 ]; then
+		printf "⚠\tinit\trubocop install failed\n" 1>&2
+		return 1
+	fi
+fi
+printf "ⓘ\tcheck\t✔ rubocop\n"
+
+
 # Directory Permissions:
 # -----------------------------------------------------------------------------
 [ -d /usr/local/share/zsh ] && chmod -R 755 /usr/local/share/zsh
 [ -d site-functions ] && chmod -R 755 site-functions
 
 
-
 # DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
 # -------------------------------------------------------------------------
-printf "ⓘ\tINIT\t✔ ${0:t:r}\n"
+printf "ⓘ\tINIT\t✔ $script_name\n"
 printf "\n"
