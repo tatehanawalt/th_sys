@@ -6,8 +6,6 @@ local thisdir=$(dirname $thisbin)
 local indir=$(pwd)
 
 source $thisdir/config.zsh
-source $thisdir/aws.zsh
-source $thisdir/targets.zsh
 
 local SRCPATH=$indir/src
 local OUTPATH=$indir/out
@@ -46,5 +44,4 @@ case ${targets[1]} in
 esac
 local result=$?
 
-echo
-echo "$result"
+[ $result -ne 0 ] && echo "$result"
