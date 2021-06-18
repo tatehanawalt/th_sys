@@ -3,14 +3,14 @@
 
 local thisbin=$0:A
 local thisdir=$(dirname $thisbin)
-local libs=$thisdir/src/zshlib
+local indir=$(pwd)
 
-source $libs/config.zsh
-source $libs/aws.zsh
-source $libs/targets.zsh
+source $thisdir/config.zsh
+source $thisdir/aws.zsh
+source $thisdir/targets.zsh
 
-local SRCPATH=$thisdir/src
-local OUTPATH=$thisdir/out
+local SRCPATH=$indir/src
+local OUTPATH=$indir/out
 
 # Parse cli args
 local targets=()
@@ -34,7 +34,13 @@ case ${targets[1]} in
   nix)   nix_target   $SRCPATH $OUTPATH ${targets[@]:1};;
   purge) purge_target $SRCPATH $OUTPATH ${targets[@]:1};;
   *)
-    echo "no tg: $targets[@]"
+    echo "target not recognized"
+    echo "use:"
+    echo "  build"
+    echo "  clean"
+    echo "  info"
+    echo "  nix"
+    echo "  purge"
     return 1
     ;;
 esac
