@@ -1,0 +1,14 @@
+#compdef gaffer
+
+_gaffer() {
+  local cmdset=()
+  cmdset+=("build\:'$fg[yellow]Build and deploy the current root.yml template$reset_color'")
+  cmdset+=("clean\:'$fg[yellow]Remove artifacts from /out$reset_color'")
+  cmdset+=("nix\:'$fg[red]delete the current stack$reset_color'")
+  cmdset+=("purge\:'$fg[red]avoid this...$reset_color'")
+  cmdset+=("info\:'$fg[green]Show general information$reset_color'")
+  _arguments -C "1: :(($cmdset))" "*:: :->args" && ret=0
+}
+
+# Invoke the cmd
+_gaffer $@

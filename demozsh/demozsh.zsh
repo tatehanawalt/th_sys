@@ -1,3 +1,5 @@
 #!/usr/bin/env zsh
 
-printf "\n\n\nDEMO ZSH\n\n\n"
+local thisbin=$0:A
+
+printf "\n\n\nDEMO ZSH located in ${thisbin}\n\n\n"

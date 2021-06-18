@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh
+#autoload
+
+local thisbin=$0:A
+local thisdir=$(dirname $thisbin)
+local libs=$thisdir/src/zshlib
+
+source $libs/config.zsh
+source $libs/aws.zsh
+source $libs/targets.zsh
+
+local SRCPATH=$thisdir/src
+local OUTPATH=$thisdir/out
+
+# Parse cli args
+local targets=()
+local multilineoption=()
+for i in $@; do
+  case $i in
+    --tag=*)
+      multilineoption+=( ${i#*=} )
+      ;;
+    *)
+      targets+=( $i )
+      ;;
+  esac
+done
+
+# Execute cli args
+case ${targets[1]} in
+  build) build_target $SRCPATH $OUTPATH ${targets[@]:1};;
+  clean) clean_target $SRCPATH $OUTPATH ${targets[@]:1};;
+  info)  info_target  $SRCPATH $OUTPATH ${targets[@]:1};;
+  nix)   nix_target   $SRCPATH $OUTPATH ${targets[@]:1};;
+  purge) purge_target $SRCPATH $OUTPATH ${targets[@]:1};;
+  *)
+    echo "no tg: $targets[@]"
+    return 1
+    ;;
+esac
+local result=$?
+
+echo
+echo "$result"

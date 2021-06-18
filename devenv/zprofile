@@ -122,6 +122,12 @@ fi
 printf "ⓘ\tcheck\t✔ bash\n"
 
 
+# AWS CLI Latest
+# -----------------------------------------------------------------------------
+# https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
+# curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+# sudo installer -pkg AWSCLIV2.pkg -target /
+
 # CHECK brew jq
 # -----------------------------------------------------------------------------
 which jq &> /dev/null
@@ -238,6 +244,7 @@ if [ -z "$GEM_HOME" ]; then
 fi
 # Add gem home to path
 [ "${PATH#*$GEM_HOME}" = "$PATH" ] && PATH="$GEM_HOME/bin:$PATH"
+
 
 # CHECK ruby rubocop
 # -----------------------------------------------------------------------------
