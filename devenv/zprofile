@@ -206,8 +206,9 @@ function {
 # -----------------------------------------------------------------------------
 apm_pkgs=(
 	atom-beautify
-	intentions
+	docker
 	busy-signal
+	intentions
 	linter
 	linter-js-yaml
 	linter-ui-default
