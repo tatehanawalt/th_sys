@@ -46,7 +46,7 @@ page_content+=(${content[@]})
 # Projects
 page_content+=($(just_wrap '##' ' ' 'Projects'))
 for name in ${project_names[@]}; do
-  page_content+=($(link_me $name "https://github.com/tatehanawalt/$(git_repo_name)/$name"))
+  page_content+=($(link_me $name "https://github.com/tatehanawalt/$(git_repo_name)/tree/main/$name"))
 done
 
 printf "" > "$readme_path"
