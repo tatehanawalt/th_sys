@@ -18,7 +18,7 @@
 # More Information:
 # Assumptions:
 # 1. Project name equals the basename of the PROJECT_PATH
-# 2. The destination path will not be taken by anyther file object
+# 2. The destination path will not be taken by another file object
 # 3. The destination directory will exist
 
 if [ ${#@} -lt 3 ]; then

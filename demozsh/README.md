@@ -1,4 +1,5 @@
 # demozsh
+
 Demozsh is a demo cli written in zsh intended to demonstrate interesting features / usage examples of zsh and provide some system utilities to the installers environment.
 
 ## Tips for developing stable zsh scripts:
