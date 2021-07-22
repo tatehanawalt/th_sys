@@ -17,7 +17,7 @@
 # Source this file in your shell init script by sourcing this file in your
 # shell initialization script (a.k.a ~/.zshrc)
 #
-# source "<path/to/this/directory>/dev.zshrc"
+# source "<path/to/this/directory>/zshrc"
 
 # Advanced Install:
 # -----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ autoload -Uz cd_hot_paths && cd_hot_paths
 
 # VCS INFO - modify shell prompt to include Version Control System metadata
 # -----------------------------------------------------------------------------
-# autoload -Uz config_dev_prompt && config_dev_prompt
+autoload -Uz config_dev_prompt && config_dev_prompt
 
 # Make Hooks - initialize hook functions in a .git repository
 # -----------------------------------------------------------------------------
@@ -161,10 +161,7 @@ function opendev {
 	return
 }
 
-# autoload -Uz devinfo
-
-# DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
-# -------------------------------------------------------------------------
+autoload -Uz devinfo
 
 # DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
 # -------------------------------------------------------------------------

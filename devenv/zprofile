@@ -103,23 +103,24 @@ git config --global push.default current      # automatically set upstream
 printf "ⓘ\tcheck\t✔ git\n"
 
 
-BASH_VER_STR=$(command bash --version)
-if [ "${BASH_VER_STR#*apple}" != "$BASH_VER_STR" ]; then
-	printf "ⓘ\tinit\tbash detected apple\n" 1>&2
-	printf "ⓘ\tinit\tinstalling bash (non-apple)\n" 1>&2
-	printf "\n"
-	command brew install bash
-	bash_install_exit_code=$?
-	printf "\n"
-	if [ $brew_install_exit_code -ne 0 ]; then
-		printf "⚠\tinit\tbash non-apple install failed\n" 1>&2
-		return 1
-	fi
-	printf "ⓘ\tinit\tinstalled non-apple bash\n" 1>&2
-	printf "ⓘ\tinit\trestart your shell\n" 1>&2
-	return 1
-fi
-printf "ⓘ\tcheck\t✔ bash\n"
+# Bash
+# BASH_VER_STR=$(command bash --version)
+# if [ "${BASH_VER_STR#*apple}" != "$BASH_VER_STR" ]; then
+# 	printf "ⓘ\tinit\tbash detected apple\n" 1>&2
+# 	printf "ⓘ\tinit\tinstalling bash (non-apple)\n" 1>&2
+# 	printf "\n"
+# 	command brew install bash
+# 	bash_install_exit_code=$?
+# 	printf "\n"
+# 	if [ $bash_install_exit_code -ne 0 ]; then
+# 		printf "⚠\tinit\tbash non-apple install failed\n" 1>&2
+# 		return 1
+# 	fi
+# 	printf "ⓘ\tinit\tinstalled non-apple bash\n" 1>&2
+# 	printf "ⓘ\tinit\trestart your shell\n" 1>&2
+# 	return 1
+# fi
+# printf "ⓘ\tcheck\t✔ bash\n"
 
 
 # AWS CLI Latest
@@ -145,6 +146,29 @@ if [ $? -ne 0 ]; then
 	fi
 fi
 printf "ⓘ\tcheck\t✔ jq\n"
+
+
+# CHECK brew watchman
+# -----------------------------------------------------------------------------
+which watchman &> /dev/null
+if [ $? -ne 0 ]; then
+	printf "ⓘ\tinit\tinstalling watchman\n"
+	printf "ⓘ\tinit\t(may take a few minutes)\n"
+	printf "\n"
+	command brew install watchman
+	printf "\n"
+	# if [ -z "$(apm ls | grep atom-beautify | sed 's/.* //')" ]; then
+	which watchman &> /dev/null
+	if [ $? -ne 0 ]; then
+		printf "⚠\tinit\tbrew watchman install failed\n" 1>&2
+		return 1
+	fi
+fi
+printf "ⓘ\tcheck\t✔ watchman\n"
+
+
+
+
 
 
 # CHECK env atom
