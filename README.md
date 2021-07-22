@@ -12,11 +12,7 @@ Find [Brew](https://brew.sh/) install instructions at  [tatehanawalt/homebrew-de
 
 Each project is a single project which can be built/compiled to a single binary (or java byte code) and installed/run with brew
 
-<br>
-
-#### Project Criteria: ####
-
-<br>
+### Project Criteria: ###
 
 **Projects must have root level directories:**
 

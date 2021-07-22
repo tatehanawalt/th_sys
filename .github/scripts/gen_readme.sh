@@ -29,12 +29,10 @@ project_names=$(find "$repo_root" \
 # Overview
 page_content+=($(just_wrap '##' ' ' 'Overview'))
 content=('Each project is a single project which can be built/compiled to a single binary (or java byte code) and installed/run with brew')
-content+=('<br>')
 
 # Criteria
-content+=($(just_wrap '####' ' ' 'Project Criteria:'))
+content+=($(just_wrap '###' ' ' 'Project Criteria:'))
 
-content+=('<br>')
 
 content+=($(just_wrap '**' '' 'Projects must have root level directories:'))
 content+=('  - `bin`')
