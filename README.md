@@ -34,19 +34,19 @@ Each project is a single project which can be built/compiled to a single binary 
 
 ## Projects ##
 
-[democ](https://github.com/tatehanawalt/th_sys/democ)
+[democ](https://github.com/tatehanawalt/th_sys/tree/main/democ)
 
-[democpp](https://github.com/tatehanawalt/th_sys/democpp)
+[democpp](https://github.com/tatehanawalt/th_sys/tree/main/democpp)
 
-[demogolang](https://github.com/tatehanawalt/th_sys/demogolang)
+[demogolang](https://github.com/tatehanawalt/th_sys/tree/main/demogolang)
 
-[demonodejs](https://github.com/tatehanawalt/th_sys/demonodejs)
+[demonodejs](https://github.com/tatehanawalt/th_sys/tree/main/demonodejs)
 
-[demopython](https://github.com/tatehanawalt/th_sys/demopython)
+[demopython](https://github.com/tatehanawalt/th_sys/tree/main/demopython)
 
-[demozsh](https://github.com/tatehanawalt/th_sys/demozsh)
+[demozsh](https://github.com/tatehanawalt/th_sys/tree/main/demozsh)
 
-[devenv](https://github.com/tatehanawalt/th_sys/devenv)
+[devenv](https://github.com/tatehanawalt/th_sys/tree/main/devenv)
 
-[gaffer](https://github.com/tatehanawalt/th_sys/gaffer)
+[gaffer](https://github.com/tatehanawalt/th_sys/tree/main/gaffer)
 
