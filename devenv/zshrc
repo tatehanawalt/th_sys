@@ -31,6 +31,21 @@
 # - Source this file with 'source "$HOT_PREFIX/coreenv/dev.zshrc"'
 script_name=${0:t:r}
 script_dir=${0:A:h}
+
+export DEVENVPATH=${0:A:h}
+
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*:*:*:*:descriptions' format '%F{green}%d%f'
+zstyle ':completion:*:*:program:*:descriptions' format '%F{green}%d%f'
+zstyle ':completion:*' format '%F{green}%d%f'
+zstyle ':completion:*' menu yes select
+
+
+setopt histexpiredupsfirst
+setopt histignoredups
+setopt histignorespace
+setopt histverify
+
 printf "\n"
 printf "ⓘ\tINIT\t$script_name\n"
 printf "ⓘ\tDIR\t$script_dir\n"
@@ -162,6 +177,8 @@ function opendev {
 }
 
 autoload -Uz devinfo
+autoload -Uz devenv
+
 
 # DEVENV ZPROFILE COMPLETED - DO NOT ADD BELOW THIS LINE
 # -------------------------------------------------------------------------
@@ -170,5 +187,6 @@ printf "\n"
 printf "functions:\n"
 printf "\tmakehooks → Initialize hook functions in a .git repository\n"
 printf "\topendev   → opens hotpaths in atom (clone/tap if not found)\n"
+printf "\tdevenv    → check dev env\n"
 printf "\tdevinfo   → show useful developer information\n"
 printf "\n"

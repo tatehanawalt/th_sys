@@ -1,24 +1,22 @@
 #!/usr/bin/env zsh
-#
-# hot_path
 # @auth Tate Hanawalt tate@tatehanawalt.com
 #
+# cd th_sys - from anywhere this will cd to ~/Desktop/th_sys or clone and then cd to ~/Desktop/th_sys
 #
-# - cd th_sys   - from anywhere this will cd to ~/Desktop/th_sys
-#   or clone and then cd to ~/Desktop/th_sys
-# - cd devtools - from anywhere this will cd to $BREW_PREFIX/**/tatehanawalt/homebrew-devtools
+# cd devtools - from anywhere this will cd to $BREW_PREFIX/**/tatehanawalt/homebrew-devtools
 #   or brew tap tatehanawalt/devtools and then cd to $BREW_PREFIX/**/tatehanawalt/homebrew-devtools
 
 # This function is intended to be defined as a widget and bound to line submission keys. It reads
 # the buffer for hot paths and executes the hot path if the cd'd path is not valid for cd.
 # a.k.a If I call `cd <hotpath>` and `<hotpath>` doesn't exist in my env, I execute the hotpath
-# definition. if `<hotpath>` is a valid cd argument then the system cd command runs as usual.
+# definition. if `<hotpath>` is a valid cd argument then the system cd command runs default
+# system cd
 function hot_paths() {
   echo ${(k)hot_cmd_org} | tr ' ' '\n' | sort
 }
 
 # hotpath
-# Acdd a hotpath command
+# Add a hotpath command
 #
 # ARGS:
 # $1 type  - [git,brew]

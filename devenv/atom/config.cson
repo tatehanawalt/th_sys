@@ -11,7 +11,7 @@
     telemetryConsent: "no"
     titleBar: "custom-inset"
   editor:
-    fontSize: 17
+    fontSize: 20
     invisibles:
       cr: false
       eol: false
@@ -19,6 +19,13 @@
     showInvisibles: true
   "exception-reporting":
     userId: "4884b25e-17c5-4a56-af65-b533f3038eb7"
+  "ide-java":
+    server:
+      configuration:
+        updateBuildConfiguration: "disabled"
+      errors:
+        incompleteClasspath:
+          severity: "ignore"
   minimap:
     adjustMinimapWidthOnlyIfSmaller: false
     adjustMinimapWidthToSoftWrap: false
